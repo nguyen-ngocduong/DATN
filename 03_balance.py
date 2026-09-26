@@ -5,22 +5,15 @@ CICIoT2023 Network Intrusion Detection
 Graduation Thesis: IoT Attack Detection & Explanation with XAI
 Plan: PLAN.md (Phase 3)
 
-Key Innovations & Methodologies:
-1. Imbalance Analysis:
-   - Imbalance Ratio (IR) & Shannon Entropy
-   - 4-Tier Severity Stratification: Majority, Medium, Minority, Extreme Minority
-2. Cost-Sensitive Learning (Inverse Frequency Class Weights):
-   - Computes balanced weights for 3 tiers: 34 Attacks, 8 Categories, Binary
-   - Preserves natural traffic distribution with O(1) memory overhead
-3. Paper-Aligned Resampling (SMOTE + Tomek Links):
-   - SMOTE: Generates synthetic interpolated samples for minority attacks
-   - Tomek Links: Detects and removes ambiguous borderline noise samples
-   - Two-Stage Scalable Hybrid: Majority Pruning + SMOTE Synthesis + Tomek Cleaning
-4. Rich Visualizations:
-   - plots/06_imbalance_analysis.png: Log-scale distribution & severity breakdown
-   - plots/07_class_weights.png: Inverse-frequency class weights
-   - plots/08_resampling_comparison.png: Before vs After class distribution
-   - plots/08b_smote_tomek_boundary.png: 2D PCA boundary cleaning visualization
+Hardened & Bulletproof Version Addressing:
+1. Guaranteed Ultra-Rare Class Preservation (Prevents classes like Uploading_Attack from vanishing in subsamples)
+2. Adaptive Fallback for SMOTE (Pre-amplifies classes with n <= k using ROS to guarantee SMOTE k-NN stability)
+3. Synchronized Target Tiers (Supports Category: 9 classes & Fine-Grained: 34 classes with unambiguous y_train_balanced.pkl interface)
+4. Memory-Safe SMOTEENN (Passes explicit sampling_strategy to avoid memory blowup)
+5. Added BorderlineSMOTE Strategy (Targets borderline support vectors in noisy IoT networks)
+6. Optional Weight Smoothing (Caps or sqrt-smooths extreme 1000+ weights to prevent neural net gradient explosion)
+7. Dynamic & Seed-Controlled Visualizations (rng-seeded sampling, tab20/continuous colormaps, dynamic titles)
+8. Exact Statistical Accounting (34 Fine-Grained Classes: 33 Attacks + Benign; 9 Categories: 8 Groups + Benign)
 """
 
 import os
@@ -38,6 +31,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE, BorderlineSMOTE, RandomOverSampler
 from imblearn.under_sampling import TomekLinks, RandomUnderSampler
 from imblearn.combine import SMOTETomek, SMOTEENN
@@ -52,24 +46,24 @@ def load_phase2_data():
     print("=" * 80)
 
     # Load X_train
-    x_paths = ['X_train.pkl', 'data/X_train.pkl']
+    x_paths = ['data/X_train.pkl', 'X_train.pkl']
     for p in x_paths:
         if os.path.exists(p):
             print(f"Loading features from: {p}")
             X_train = joblib.load(p)
             break
     else:
-        raise FileNotFoundError("Could not find X_train.pkl in root or data/ directory!")
+        raise FileNotFoundError("Could not find X_train.pkl in data/ or root directory!")
 
     # Load y_train
-    y_paths = ['y_train.pkl', 'data/y_train.pkl']
+    y_paths = ['data/y_train.pkl', 'y_train.pkl']
     for p in y_paths:
         if os.path.exists(p):
             print(f"Loading labels from: {p}")
             y_train_dict = joblib.load(p)
             break
     else:
-        raise FileNotFoundError("Could not find y_train.pkl in root or data/ directory!")
+        raise FileNotFoundError("Could not find y_train.pkl in data/ or root directory!")
 
     # Load preprocessor
     prep_path = 'models/preprocessor.joblib'
@@ -86,6 +80,8 @@ def analyze_imbalance(y_names, y_cat_names, label_mapping, category_mapping):
     """
     Task 3.1: Quantitative Imbalance Analysis
     Calculates Imbalance Ratio (IR), Shannon Entropy, and 4-Tier Severity breakdown.
+    34 Fine-Grained Classes: 33 Attacks + Benign
+    9 Attack Categories: 8 Attack Groups + Benign
     """
     print("\n" + "=" * 80)
     print("TASK 3.1: IMBALANCE QUANTITATIVE ANALYSIS")
@@ -113,14 +109,14 @@ def analyze_imbalance(y_names, y_cat_names, label_mapping, category_mapping):
     max_entropy_cat = np.log2(len(cat_counts))
     entropy_ratio_cat = actual_entropy_cat / max_entropy_cat
 
-    # 4-Tier Severity breakdown for 34 attack classes
+    # 4-Tier Severity breakdown for 34 classes
     majority = label_pct[label_pct >= 5.0].index.tolist()
     medium = label_pct[(label_pct >= 1.0) & (label_pct < 5.0)].index.tolist()
     minority = label_pct[(label_pct >= 0.1) & (label_pct < 1.0)].index.tolist()
     extreme = label_pct[label_pct < 0.1].index.tolist()
 
     print(f"Total Traffic Samples: {total_samples:,}")
-    print(f"Fine-Grained Classes: {len(label_counts)} | Categories: {len(cat_counts)}")
+    print(f"Fine-Grained Classes: {len(label_counts)} (33 Attacks + Benign) | Categories: {len(cat_counts)} (8 Attack Groups + Benign)")
     print(f"Fine-Grained IR:       {ir_fine:,.1f}:1 (Max: {label_counts.idxmax()}={label_counts.max():,}, Min: {label_counts.idxmin()}={label_counts.min():,})")
     print(f"Category IR:           {ir_cat:,.1f}:1 (Max: {cat_counts.idxmax()}={cat_counts.max():,}, Min: {cat_counts.idxmin()}={cat_counts.min():,})")
     print(f"Shannon Entropy Ratio: {entropy_ratio_fine:.4f} (Fine-Grained) | {entropy_ratio_cat:.4f} (Category)")
@@ -145,36 +141,52 @@ def analyze_imbalance(y_names, y_cat_names, label_mapping, category_mapping):
     }
 
 
-def compute_all_weights(y_encoded, y_cat_encoded, y_binary, reverse_label_map, reverse_cat_map):
+def compute_all_weights(y_encoded, y_cat_encoded, y_binary, reverse_label_map, reverse_cat_map,
+                        smoothing='none'):
     """
     Task 3.2A: Cost-Sensitive Learning - Inverse Frequency Class Weights
-    Computes exact weights across 3 classification tiers.
+    Computes exact weights across 3 classification tiers with optional smoothing.
+    smoothing: 'none', 'sqrt', 'log', 'cap' (cap max weight at 100)
     """
     print("\n" + "=" * 80)
     print("TASK 3.2A: COST-SENSITIVE LEARNING (INVERSE FREQUENCY WEIGHTS)")
     print("=" * 80)
 
+    def apply_smoothing(weights_dict, mode):
+        if mode == 'sqrt':
+            return {k: round(float(np.sqrt(v)), 6) for k, v in weights_dict.items()}
+        elif mode == 'log':
+            return {k: round(float(np.log1p(v)), 6) for k, v in weights_dict.items()}
+        elif mode == 'cap':
+            return {k: round(float(min(v, 100.0)), 6) for k, v in weights_dict.items()}
+        return {k: round(float(v), 6) for k, v in weights_dict.items()}
+
     # 1. Fine-grained (34 classes)
     unique_labels = np.unique(y_encoded)
     cw_arr = compute_class_weight('balanced', classes=unique_labels, y=y_encoded)
-    cw_encoded = dict(zip(unique_labels.tolist(), cw_arr.tolist()))
-    cw_named = {reverse_label_map[c]: round(w, 6) for c, w in cw_encoded.items()}
+    raw_cw_encoded = dict(zip(unique_labels.tolist(), cw_arr.tolist()))
+    cw_encoded = apply_smoothing(raw_cw_encoded, smoothing)
+    cw_named = {reverse_label_map[c]: cw_encoded[c] for c in unique_labels}
 
-    # 2. Categories (8 groups)
+    # 2. Categories (9 groups)
     unique_cats = np.unique(y_cat_encoded)
     cat_arr = compute_class_weight('balanced', classes=unique_cats, y=y_cat_encoded)
-    cat_encoded = dict(zip(unique_cats.tolist(), cat_arr.tolist()))
-    cat_named = {reverse_cat_map[c]: round(w, 6) for c, w in cat_encoded.items()}
+    raw_cat_encoded = dict(zip(unique_cats.tolist(), cat_arr.tolist()))
+    cat_encoded = apply_smoothing(raw_cat_encoded, smoothing)
+    cat_named = {reverse_cat_map[c]: cat_encoded[c] for c in unique_cats}
 
     # 3. Binary (Benign vs Attack)
     unique_bin = np.unique(y_binary)
     bin_arr = compute_class_weight('balanced', classes=unique_bin, y=y_binary)
-    bin_weights = dict(zip(unique_bin.tolist(), bin_arr.tolist()))
+    bin_weights = dict(zip(unique_bin.tolist(), [round(float(w), 6) for w in bin_arr]))
+
+    if smoothing != 'none':
+        print(f"Applied weight smoothing: '{smoothing}' (prevents gradient explosion in neural nets/logistic).")
 
     print(f"Computed weights for {len(cw_encoded)} fine-grained classes.")
     print(f"  Highest weight: {max(cw_named.items(), key=lambda x: x[1])}")
     print(f"  Lowest weight:  {min(cw_named.items(), key=lambda x: x[1])}")
-    print(f"Computed weights for {len(cat_encoded)} categories.")
+    print(f"Computed weights for {len(cat_encoded)} categories (8 Attack Groups + Benign).")
     for cat_name, w in sorted(cat_named.items(), key=lambda x: x[1], reverse=True):
         print(f"  {cat_name:<15}: weight = {w:8.4f}")
     print(f"Binary weights: Benign (0) = {bin_weights.get(0, 0):.4f}, Attack (1) = {bin_weights.get(1, 0):.4f}")
@@ -182,157 +194,197 @@ def compute_all_weights(y_encoded, y_cat_encoded, y_binary, reverse_label_map, r
     return cw_encoded, cw_named, cat_encoded, cat_named, bin_weights
 
 
-def paper_smotetomek_resample(X_sub, y_sub, target_minority=5000, k_neighbors=5, random_state=42):
+def guaranteed_minority_subsample(X, y, sample_size, min_preserve_threshold=200, random_state=42):
     """
-    Paper-Standard Resampling: SMOTE + Tomek Links (SMOTETomek).
-    1. SMOTE creates synthetic samples for minority classes.
-    2. Tomek Links identifies & removes overlapping borderline noise samples.
+    Guarantees that ultra-rare classes are NEVER lost or starved during subsampling.
+    Fixes Bug #1:
+    - 100% of samples in classes with <= min_preserve_threshold samples are preserved!
+    - The remaining sample budget is drawn via stratified sampling from the larger classes.
+    - Explicit assertion guarantees ZERO classes are dropped.
     """
-    counts = pd.Series(y_sub).value_counts()
-    min_count = counts.min()
-    effective_k = max(1, min(k_neighbors, min_count - 1)) if min_count > 1 else 1
+    total_rows = len(y)
+    if sample_size is None or sample_size >= total_rows:
+        return X.copy(), np.array(y)
 
-    strategy_over = {}
-    for cls, cnt in counts.items():
-        if cnt < target_minority:
-            strategy_over[cls] = target_minority
-
-    print(f"  [SMOTE] Classes targeted for synthesis: {len(strategy_over)} (target={target_minority:,}, k={effective_k})")
+    counts = pd.Series(y).value_counts()
+    rare_classes = counts[counts <= min_preserve_threshold].index.tolist()
     
-    if strategy_over:
-        smote = SMOTE(sampling_strategy=strategy_over, k_neighbors=effective_k, random_state=random_state)
+    if rare_classes:
+        print(f"  [Safety Guard] Preserving 100% of samples for {len(rare_classes)} ultra-rare classes (<= {min_preserve_threshold} samples)...")
+        y_series = pd.Series(y)
+        rare_indices = y_series[y_series.isin(rare_classes)].index.values
+        common_indices = y_series[~y_series.isin(rare_classes)].index.values
+
+        X_rare = X.iloc[rare_indices] if hasattr(X, 'iloc') else X[rare_indices]
+        y_rare = y[rare_indices]
+
+        X_common = X.iloc[common_indices] if hasattr(X, 'iloc') else X[common_indices]
+        y_common = y[common_indices]
+
+        remaining_budget = max(len(counts) * 20, sample_size - len(y_rare))
+        if remaining_budget < len(y_common):
+            _, X_sub_com, _, y_sub_com = train_test_split(
+                X_common, y_common,
+                test_size=remaining_budget,
+                stratify=y_common,
+                random_state=random_state
+            )
+        else:
+            X_sub_com, y_sub_com = X_common, y_common
+
+        if hasattr(X, 'iloc'):
+            X_sub = pd.concat([X_rare, X_sub_com], axis=0).reset_index(drop=True)
+        else:
+            X_sub = pd.DataFrame(np.vstack([X_rare, X_sub_com]))
+        y_sub = np.concatenate([y_rare, y_sub_com])
     else:
-        smote = 'passthrough'
+        _, X_sub, _, y_sub = train_test_split(
+            X, y,
+            test_size=sample_size,
+            stratify=y,
+            random_state=random_state
+        )
+        X_sub = pd.DataFrame(X_sub, columns=X.columns) if hasattr(X, 'columns') else pd.DataFrame(X_sub)
+        y_sub = np.array(y_sub)
 
-    tomek = TomekLinks(sampling_strategy='all', n_jobs=-1)
-
-    if strategy_over:
-        smt = SMOTETomek(smote=smote, tomek=tomek, random_state=random_state)
-        X_res, y_res = smt.fit_resample(X_sub, y_sub)
-    else:
-        X_res, y_res = tomek.fit_resample(X_sub, y_sub)
-
-    return X_res, y_res
+    # Assert 100% class preservation
+    n_orig = pd.Series(y).nunique()
+    n_sub = pd.Series(y_sub).nunique()
+    assert n_sub == n_orig, f"CRITICAL BUG: Classes were lost in subsampling! (Expected {n_orig}, got {n_sub})"
+    print(f"  Subsampling complete: {len(y_sub):,} samples preserving all {n_sub} classes perfectly.")
+    return X_sub, y_sub
 
 
-def scalable_hybrid_resample(X_sub, y_sub, target_majority=50000, target_minority=8000,
-                            k_neighbors=5, random_state=42):
+def adaptive_smote_pre_ros(X_work, y_work, strategy_over, k_neighbors=5, random_state=42):
     """
-    Paper-Enhanced Scalable Two-Stage Hybrid Strategy for Big Data IoT:
-    Stage 1: Smart Pruning of massive majority classes (DDoS, DoS) via RandomUnderSampler.
-    Stage 2: Synthetic Interpolation of minority classes via SMOTE (Borderline/Standard).
-    Stage 3: Tomek Links Boundary Cleaning to eliminate overlapping synthetic & real noise.
+    Fixes Bug: Adaptive ROS fallback when a class has n <= k_neighbors.
+    SMOTE requires at least k+1 samples to form k nearest neighbors.
+    Pre-amplifies ultra-rare classes with RandomOverSampler up to k+2 samples so SMOTE never crashes!
     """
-    counts_init = pd.Series(y_sub).value_counts()
+    counts = pd.Series(y_work).value_counts()
+    ros_fix = {}
+    for cls, target in strategy_over.items():
+        if counts.get(cls, 0) <= k_neighbors:
+            ros_fix[cls] = k_neighbors + 2
+
+    if ros_fix:
+        print(f"  [Adaptive ROS Fallback] Pre-amplifying {len(ros_fix)} classes (n <= {k_neighbors}) up to {k_neighbors+2} samples for SMOTE stability...")
+        ros = RandomOverSampler(sampling_strategy=ros_fix, random_state=random_state)
+        X_work, y_work = ros.fit_resample(X_work, y_work)
     
-    # 1. Under-sampling strategy
-    strategy_under = {}
-    for cls, cnt in counts_init.items():
-        if cnt > target_majority:
-            strategy_under[cls] = target_majority
-
-    if strategy_under:
-        print(f"  [Stage 1: Majority Pruning] {len(strategy_under)} majority classes pruned to {target_majority:,}")
-        rus = RandomUnderSampler(sampling_strategy=strategy_under, random_state=random_state)
-        X_work, y_work = rus.fit_resample(X_sub, y_sub)
-    else:
-        X_work, y_work = X_sub.copy(), y_sub.copy()
-
-    # 2. Over-sampling strategy (SMOTE)
-    counts_mid = pd.Series(y_work).value_counts()
-    strategy_over = {}
-    for cls, cnt in counts_mid.items():
-        if cnt < target_minority:
-            strategy_over[cls] = target_minority
-
-    if strategy_over:
-        min_cnt = min(counts_mid[cls] for cls in strategy_over.keys())
-        eff_k = max(1, min(k_neighbors, min_cnt - 1)) if min_cnt > 1 else 1
-        print(f"  [Stage 2: SMOTE Synthesis] {len(strategy_over)} minority classes synthesized to {target_minority:,} (k={eff_k})")
-        smote = SMOTE(sampling_strategy=strategy_over, k_neighbors=eff_k, random_state=random_state)
-        X_work, y_work = smote.fit_resample(X_work, y_work)
-    
-    # 3. Boundary Cleaning (Tomek Links)
-    print("  [Stage 3: Tomek Links Cleaning] Detecting and removing borderline ambiguous pairs...")
-    t0_tomek = time.time()
-    tomek = TomekLinks(sampling_strategy='all', n_jobs=-1)
-    X_work, y_work = tomek.fit_resample(X_work, y_work)
-    print(f"  [Stage 3 Done] Tomek Links boundary cleaning completed in {time.time()-t0_tomek:.2f}s")
-
     return X_work, y_work
 
 
 def apply_resampling_pipeline(X_train, y_target, reverse_map,
-                              strategy='hybrid', sample_size=200000,
-                              target_majority=35000, target_minority=8000,
+                              strategy='hybrid', sample_size=150000,
+                              target_majority=30000, target_minority=8000,
                               k_neighbors=5, random_state=42):
     """
     Main Resampling Controller supporting:
-    - 'smotetomek' (Paper Method)
-    - 'hybrid' (Scalable Two-Stage SMOTE + Tomek Links for IoT)
-    - 'smoteenn' (SMOTE + Edited Nearest Neighbours)
-    - 'smote' (SMOTE only)
+    - 'hybrid': Scalable SMOTE + Tomek Links for Big Data IoT
+    - 'smotetomek': Pure Paper-Standard SMOTE + Tomek Links
+    - 'borderlinesmote': Borderline-SMOTE + Tomek Links
+    - 'smote': SMOTE only
+    - 'smoteenn': Memory-Safe SMOTE + ENN
     """
     print("\n" + "=" * 80)
     print(f"TASK 3.2B: RESAMPLING PIPELINE [Strategy: {strategy.upper()}]")
     print("=" * 80)
 
-    total_rows = len(y_target)
-    # Stratified Subsampling if dataset exceeds sample_size
-    if sample_size and sample_size < total_rows:
-        print(f"Drawing stratified representative sample: {sample_size:,} / {total_rows:,} rows...")
-        from sklearn.model_selection import train_test_split
-        _, X_sub, _, y_sub = train_test_split(
-            X_train, y_target,
-            test_size=sample_size,
-            stratify=y_target,
-            random_state=random_state
-        )
-        # Convert to numpy/dataframe clean
-        X_sub = pd.DataFrame(X_sub, columns=X_train.columns) if hasattr(X_train, 'columns') else pd.DataFrame(X_sub)
-        y_sub = np.array(y_sub)
-    else:
-        X_sub = X_train.copy()
-        y_sub = np.array(y_target)
+    # Guaranteed minority preservation during subsampling
+    X_sub, y_sub = guaranteed_minority_subsample(
+        X_train, y_target, sample_size=sample_size, random_state=random_state
+    )
 
     counts_before = pd.Series(y_sub).value_counts()
-    print(f"Sample size before resampling: {len(y_sub):,} rows across {len(counts_before)} classes")
-    print(f"Class count range: min={counts_before.min():,}, max={counts_before.max():,}")
+    print(f"Class count range before: min={counts_before.min():,}, max={counts_before.max():,}")
 
     t0 = time.time()
-    if strategy == 'smotetomek':
-        X_bal, y_bal = paper_smotetomek_resample(
-            X_sub, y_sub,
-            target_minority=target_minority,
-            k_neighbors=k_neighbors,
-            random_state=random_state
-        )
-    elif strategy == 'hybrid':
-        X_bal, y_bal = scalable_hybrid_resample(
-            X_sub, y_sub,
-            target_majority=target_majority,
-            target_minority=target_minority,
-            k_neighbors=k_neighbors,
-            random_state=random_state
-        )
+    
+    # 1. Determine oversampling targets
+    strategy_over = {c: target_minority for c, cnt in counts_before.items() if cnt < target_minority}
+    # 2. Determine undersampling targets
+    strategy_under = {c: target_majority for c, cnt in counts_before.items() if cnt > target_majority}
+
+    if strategy == 'hybrid':
+        # Stage 1: Smart Majority Pruning
+        if strategy_under:
+            print(f"  [Stage 1: Majority Pruning] Pruning {len(strategy_under)} majority classes down to {target_majority:,}...")
+            rus = RandomUnderSampler(sampling_strategy=strategy_under, random_state=random_state)
+            X_work, y_work = rus.fit_resample(X_sub, y_sub)
+        else:
+            X_work, y_work = X_sub.copy(), y_sub.copy()
+
+        # Stage 2: SMOTE Synthesis with Adaptive ROS Fallback
+        if strategy_over:
+            X_work, y_work = adaptive_smote_pre_ros(X_work, y_work, strategy_over, k_neighbors=k_neighbors, random_state=random_state)
+            print(f"  [Stage 2: SMOTE Synthesis] Interpolating {len(strategy_over)} minority classes up to {target_minority:,}...")
+            smote = SMOTE(sampling_strategy=strategy_over, k_neighbors=k_neighbors, random_state=random_state)
+            X_work, y_work = smote.fit_resample(X_work, y_work)
+
+        # Stage 3: Tomek Links Boundary Cleaning
+        print("  [Stage 3: Tomek Links Cleaning] Detecting and removing borderline ambiguous pairs...")
+        tomek = TomekLinks(sampling_strategy='all', n_jobs=-1)
+        X_bal, y_bal = tomek.fit_resample(X_work, y_work)
+
+    elif strategy == 'borderlinesmote':
+        if strategy_under:
+            rus = RandomUnderSampler(sampling_strategy=strategy_under, random_state=random_state)
+            X_work, y_work = rus.fit_resample(X_sub, y_sub)
+        else:
+            X_work, y_work = X_sub.copy(), y_sub.copy()
+
+        if strategy_over:
+            X_work, y_work = adaptive_smote_pre_ros(X_work, y_work, strategy_over, k_neighbors=k_neighbors, random_state=random_state)
+            print(f"  [BorderlineSMOTE] Synthesizing along decision boundaries...")
+            bsmote = BorderlineSMOTE(sampling_strategy=strategy_over, k_neighbors=k_neighbors, random_state=random_state)
+            X_work, y_work = bsmote.fit_resample(X_work, y_work)
+
+        tomek = TomekLinks(sampling_strategy='all', n_jobs=-1)
+        X_bal, y_bal = tomek.fit_resample(X_work, y_work)
+
+    elif strategy == 'smotetomek':
+        X_work, y_work = X_sub.copy(), y_sub.copy()
+        if strategy_over:
+            X_work, y_work = adaptive_smote_pre_ros(X_work, y_work, strategy_over, k_neighbors=k_neighbors, random_state=random_state)
+            smote = SMOTE(sampling_strategy=strategy_over, k_neighbors=k_neighbors, random_state=random_state)
+        else:
+            smote = 'passthrough'
+        
+        tomek = TomekLinks(sampling_strategy='all', n_jobs=-1)
+        if strategy_over:
+            smt = SMOTETomek(smote=smote, tomek=tomek, random_state=random_state)
+            X_bal, y_bal = smt.fit_resample(X_work, y_work)
+        else:
+            X_bal, y_bal = tomek.fit_resample(X_work, y_work)
+
     elif strategy == 'smote':
-        counts = pd.Series(y_sub).value_counts()
-        strat_over = {c: target_minority for c, cnt in counts.items() if cnt < target_minority}
-        min_cnt = min(counts[c] for c in strat_over.keys()) if strat_over else 2
-        eff_k = max(1, min(k_neighbors, min_cnt - 1)) if min_cnt > 1 else 1
-        smote = SMOTE(sampling_strategy=strat_over, k_neighbors=eff_k, random_state=random_state)
-        X_bal, y_bal = smote.fit_resample(X_sub, y_sub)
+        X_work, y_work = X_sub.copy(), y_sub.copy()
+        if strategy_over:
+            X_work, y_work = adaptive_smote_pre_ros(X_work, y_work, strategy_over, k_neighbors=k_neighbors, random_state=random_state)
+            smote = SMOTE(sampling_strategy=strategy_over, k_neighbors=k_neighbors, random_state=random_state)
+            X_bal, y_bal = smote.fit_resample(X_work, y_work)
+        else:
+            X_bal, y_bal = X_work, y_work
+
     elif strategy == 'smoteenn':
-        sme = SMOTEENN(random_state=random_state, n_jobs=-1)
-        X_bal, y_bal = sme.fit_resample(X_sub, y_sub)
+        # Memory-safe SMOTEENN with explicit sampling strategy
+        X_work, y_work = X_sub.copy(), y_sub.copy()
+        if strategy_over:
+            X_work, y_work = adaptive_smote_pre_ros(X_work, y_work, strategy_over, k_neighbors=k_neighbors, random_state=random_state)
+            smote = SMOTE(sampling_strategy=strategy_over, k_neighbors=k_neighbors, random_state=random_state)
+            sme = SMOTEENN(smote=smote, random_state=random_state, n_jobs=-1)
+            X_bal, y_bal = sme.fit_resample(X_work, y_work)
+        else:
+            X_bal, y_bal = X_work, y_work
     else:
-        raise ValueError(f"Unknown resampling strategy: {strategy}")
+        raise ValueError(f"Unsupported strategy: {strategy}")
 
     elapsed = time.time() - t0
     counts_after = pd.Series(y_bal).value_counts()
 
     print(f"\nResampling complete in {elapsed:.2f} seconds!")
-    print(f"Rows progression: {len(y_sub):,} -> {len(y_bal):,} rows")
+    print(f"Sample progression: {len(y_sub):,} -> {len(y_bal):,} rows")
     print(f"New class count range: min={counts_after.min():,}, max={counts_after.max():,}")
     print(f"New Imbalance Ratio: {counts_after.max() / counts_after.min():.2f}:1 (previously {counts_before.max() / counts_before.min():.2f}:1)")
 
@@ -340,10 +392,15 @@ def apply_resampling_pipeline(X_train, y_target, reverse_map,
 
 
 def generate_visualizations(analysis_results, class_weights_named, cat_weights_named,
+                            strategy_name='Hybrid', target_tier='category',
                             counts_before=None, counts_after=None,
-                            X_pca_sample=None, y_pca_sample=None, reverse_cat_map=None):
+                            X_pca_sample=None, y_pca_sample=None, reverse_map=None):
     """
     Generate all Phase 3 publication-ready plots.
+    Fixes:
+    - Dynamic titles reflecting strategy and tier
+    - Seed-controlled PCA sampling with rng
+    - Tab20/continuous colormaps for fine-grained 34 classes
     """
     print("\n" + "=" * 80)
     print("GENERATING VISUALIZATIONS")
@@ -364,10 +421,10 @@ def generate_visualizations(analysis_results, class_weights_named, cat_weights_n
     colors_bar = plt.cm.plasma(np.linspace(0.15, 0.85, len(label_counts)))[::-1]
     ax1.barh(range(len(label_counts)), label_counts.values, color=colors_bar, edgecolor='black', linewidth=0.5)
     ax1.set_yticks(range(len(label_counts)))
-    ax1.set_yticklabels(label_counts.index, fontsize=7, fontweight='medium')
+    ax1.set_yticklabels(label_counts.index, fontsize=7.5, fontweight='medium')
     ax1.set_xscale('log')
     ax1.set_xlabel('Sample Count (Log Scale)', fontsize=11, fontweight='bold')
-    ax1.set_title(f'CICIoT2023 Class Distribution (34 Attacks + Benign)\nImbalance Ratio = {analysis_results["ir_fine"]:,.1f}:1',
+    ax1.set_title(f'CICIoT2023 Class Distribution (33 Attacks + Benign = 34 Classes)\nImbalance Ratio = {analysis_results["ir_fine"]:,.1f}:1',
                   fontsize=12, fontweight='bold')
     ax1.grid(True, linestyle='--', alpha=0.5, axis='x')
     ax1.invert_yaxis()
@@ -405,7 +462,7 @@ def generate_visualizations(analysis_results, class_weights_named, cat_weights_n
     ax1.set_yticklabels(cw_names, fontsize=7)
     ax1.set_xscale('log')
     ax1.set_xlabel('Class Weight Value (Log Scale)', fontsize=11, fontweight='bold')
-    ax1.set_title('Inverse Frequency Class Weights (34 Attacks)', fontsize=12, fontweight='bold')
+    ax1.set_title('Inverse Frequency Class Weights (34 Classes)', fontsize=12, fontweight='bold')
     ax1.axvline(x=1.0, color='red', linestyle='--', linewidth=1.2, label='Neutral Weight = 1.0')
     ax1.grid(True, linestyle='--', alpha=0.5, axis='x')
     ax1.legend()
@@ -417,7 +474,7 @@ def generate_visualizations(analysis_results, class_weights_named, cat_weights_n
     cat_vals = [x[1] for x in sorted_cat]
     bars_cat = ax2.bar(cat_names, cat_vals, color='#3498db', edgecolor='black', linewidth=0.8, width=0.55)
     ax2.set_ylabel('Category Weight Value', fontsize=11, fontweight='bold')
-    ax2.set_title('Inverse Frequency Category Weights (8 Attack Groups + Benign)', fontsize=12, fontweight='bold')
+    ax2.set_title('Inverse Frequency Category Weights (8 Attack Groups + Benign = 9 Classes)', fontsize=12, fontweight='bold')
     ax2.set_xticklabels(cat_names, rotation=35, ha='right', fontsize=10, fontweight='bold')
     ax2.grid(True, linestyle='--', alpha=0.5, axis='y')
     for bar, val in zip(bars_cat, cat_vals):
@@ -440,24 +497,19 @@ def generate_visualizations(analysis_results, class_weights_named, cat_weights_n
 
         counts_b_aligned = [counts_before.get(k, 0) for k in common_indices]
         counts_a_aligned = [counts_after.get(k, 0) for k in common_indices]
-
-        # Use category labels if mapping provided
-        if reverse_cat_map:
-            tick_labels = [reverse_cat_map.get(k, str(k)) for k in common_indices]
-        else:
-            tick_labels = [str(k) for k in common_indices]
+        tick_labels = [reverse_map.get(k, str(k)) for k in common_indices] if reverse_map else [str(k) for k in common_indices]
 
         ax.bar(x_indices - bar_width/2, counts_b_aligned, width=bar_width,
                label='Original (Before Resampling)', color='#e74c3c', alpha=0.85, edgecolor='black')
         ax.bar(x_indices + bar_width/2, counts_a_aligned, width=bar_width,
-               label='Resampled (SMOTE + Tomek Links)', color='#2ecc71', alpha=0.85, edgecolor='black')
+               label=f'Resampled ({strategy_name})', color='#2ecc71', alpha=0.85, edgecolor='black')
 
         ax.set_ylabel('Sample Count (Log Scale)', fontsize=11, fontweight='bold')
         ax.set_yscale('log')
-        ax.set_title('Comparison: Class Distribution Before vs. After Paper-Aligned Resampling',
+        ax.set_title(f'Comparison: Class Distribution Before vs. After [{strategy_name.upper()}] ({target_tier.title()} Level)',
                      fontsize=13, fontweight='bold')
         ax.set_xticks(x_indices)
-        ax.set_xticklabels(tick_labels, rotation=35, ha='right', fontsize=10, fontweight='bold')
+        ax.set_xticklabels(tick_labels, rotation=35, ha='right', fontsize=9 if len(tick_labels) > 15 else 10, fontweight='bold')
         ax.grid(True, linestyle='--', alpha=0.5, axis='y')
         ax.legend(fontsize=11)
 
@@ -471,26 +523,33 @@ def generate_visualizations(analysis_results, class_weights_named, cat_weights_n
     # --------------------------------------------------------------------------
     if X_pca_sample is not None and y_pca_sample is not None:
         try:
-            print("  Generating 2D PCA boundary cleaning visualization...")
+            print("  Generating 2D PCA decision space visualization with seed control...")
             pca = PCA(n_components=2, random_state=42)
             X_2d = pca.fit_transform(X_pca_sample)
             
-            fig, ax = plt.subplots(figsize=(12, 8))
+            fig, ax = plt.subplots(figsize=(13, 8))
             unique_classes = np.unique(y_pca_sample)
-            palette = plt.cm.tab10(np.linspace(0, 1, len(unique_classes)))
+            n_classes = len(unique_classes)
+            
+            if n_classes <= 10:
+                palette = plt.cm.tab10(np.linspace(0, 1, n_classes))
+            elif n_classes <= 20:
+                palette = plt.cm.tab20(np.linspace(0, 1, n_classes))
+            else:
+                palette = plt.cm.gist_rainbow(np.linspace(0, 1, n_classes))
             
             for cls_idx, color in zip(unique_classes, palette):
                 mask = (y_pca_sample == cls_idx)
-                label_txt = reverse_cat_map.get(cls_idx, f"Class {cls_idx}") if reverse_cat_map else f"Class {cls_idx}"
+                label_txt = reverse_map.get(cls_idx, f"Class {cls_idx}") if reverse_map else f"Class {cls_idx}"
                 ax.scatter(X_2d[mask, 0], X_2d[mask, 1],
-                           c=[color], label=label_txt, alpha=0.6, s=15, edgecolor='none')
+                           c=[color], label=label_txt, alpha=0.65, s=16, edgecolor='none')
 
-            ax.set_title(f'PCA 2D Decision Space After SMOTETomek Boundary Cleaning\nExplained Variance: {pca.explained_variance_ratio_.sum()*100:.1f}%',
+            ax.set_title(f'PCA 2D Decision Space After [{strategy_name.upper()}] ({target_tier.title()} Level)\nExplained Variance: {pca.explained_variance_ratio_.sum()*100:.1f}%',
                          fontsize=12, fontweight='bold')
             ax.set_xlabel('Principal Component 1', fontweight='bold')
             ax.set_ylabel('Principal Component 2', fontweight='bold')
             ax.grid(True, linestyle='--', alpha=0.4)
-            ax.legend(bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=9)
+            ax.legend(bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=8.5 if n_classes > 15 else 9.5)
 
             plt.tight_layout()
             plt.savefig('plots/08b_smote_tomek_boundary.png', dpi=200, bbox_inches='tight')
@@ -501,7 +560,7 @@ def generate_visualizations(analysis_results, class_weights_named, cat_weights_n
 
 
 def save_artifacts(cw_encoded, cw_named, cat_encoded, cat_named, bin_weights,
-                   preprocessor, X_balanced=None, y_balanced=None,
+                   preprocessor, X_balanced=None, y_balanced_dict=None,
                    resampling_summary=None):
     """
     Task 3.3: Save all deliverables into models/ and data/
@@ -520,9 +579,9 @@ def save_artifacts(cw_encoded, cw_named, cat_encoded, cat_named, bin_weights,
         'category_named': cat_named,
         'binary': bin_weights
     }
-    joblib.dump(all_weights, 'class_weights.pkl')
     joblib.dump(all_weights, 'data/class_weights.pkl')
-    print("  [Saved] class_weights.pkl & data/class_weights.pkl")
+    joblib.dump(all_weights, 'class_weights.pkl')
+    print("  [Saved] data/class_weights.pkl & class_weights.pkl")
 
     # 2. Save JSON format for human readability
     weights_json = {
@@ -543,9 +602,9 @@ def save_artifacts(cw_encoded, cw_named, cat_encoded, cat_named, bin_weights,
     print("  [Updated] models/preprocessor.joblib")
 
     # 4. Save balanced dataset if generated
-    if X_balanced is not None and y_balanced is not None:
+    if X_balanced is not None and y_balanced_dict is not None:
         joblib.dump(X_balanced, 'data/X_train_balanced.pkl', compress=3)
-        joblib.dump(y_balanced, 'data/y_train_balanced.pkl', compress=3)
+        joblib.dump(y_balanced_dict, 'data/y_train_balanced.pkl', compress=3)
         print("  [Saved] data/X_train_balanced.pkl & data/y_train_balanced.pkl")
 
     # 5. Save Resampling Summary JSON
@@ -556,21 +615,26 @@ def save_artifacts(cw_encoded, cw_named, cat_encoded, cat_named, bin_weights,
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Phase 3: Imbalance Handling with Paper-Aligned SMOTETomek & Hybrid Resampling")
+    parser = argparse.ArgumentParser(description="Phase 3: Hardened Imbalance Handling Pipeline")
     parser.add_argument('--strategy', type=str, default='hybrid',
-                        choices=['hybrid', 'smotetomek', 'smote', 'smoteenn', 'weights_only'],
-                        help="Resampling strategy: 'hybrid' (Scalable SMOTE+Tomek for IoT), 'smotetomek' (Paper), 'smote', 'smoteenn', 'weights_only'")
+                        choices=['hybrid', 'smotetomek', 'borderlinesmote', 'smote', 'smoteenn', 'weights_only'],
+                        help="Resampling strategy: 'hybrid' (Scalable IoT), 'smotetomek', 'borderlinesmote', 'smote', 'smoteenn', 'weights_only'")
     parser.add_argument('--target-tier', type=str, default='category',
                         choices=['category', 'label'],
-                        help="Target level to resample: 'category' (8 attack groups) or 'label' (34 attacks)")
+                        help="Target tier: 'category' (9 classes: 8 attack groups + Benign) or 'label' (34 fine-grained classes)")
     parser.add_argument('--sample-size', type=int, default=150000,
-                        help="Stratified sample size before resampling (default: 150000 rows)")
+                        help="Sample size before resampling with guaranteed minority preservation (default: 150000)")
     parser.add_argument('--target-majority', type=int, default=30000,
                         help="Max samples per majority class after pruning (default: 30000)")
     parser.add_argument('--target-minority', type=int, default=8000,
                         help="Min samples per minority class after SMOTE (default: 8000)")
     parser.add_argument('--k-neighbors', type=int, default=5,
                         help="Number of nearest neighbors for SMOTE (default: 5)")
+    parser.add_argument('--weight-smoothing', type=str, default='none',
+                        choices=['none', 'sqrt', 'log', 'cap'],
+                        help="Class weight smoothing mode: 'none', 'sqrt', 'log', 'cap' (cap at 100)")
+    parser.add_argument('--random-state', type=int, default=42,
+                        help="Random seed for reproducibility")
     parser.add_argument('--skip-plots', action='store_true',
                         help="Skip generating visualization plots")
     args = parser.parse_args()
@@ -589,16 +653,18 @@ def main():
     reverse_label = {v: k for k, v in label_mapping.items()}
     reverse_cat = {v: k for k, v in category_mapping.items()}
 
-    # Task 3.1: Imbalance Analysis
+    # Task 3.1: Quantitative Imbalance Analysis
     analysis_results = analyze_imbalance(y_names, y_cat_names, label_mapping, category_mapping)
 
     # Task 3.2A: Compute Class Weights (Always executed)
     cw_enc, cw_named, cat_enc, cat_named, bin_w = compute_all_weights(
-        y_encoded, y_cat_encoded, y_binary, reverse_label, reverse_cat
+        y_encoded, y_cat_encoded, y_binary, reverse_label, reverse_cat,
+        smoothing=args.weight_smoothing
     )
 
-    # Task 3.2B: Resampling
+    # Task 3.2B: Resampling Pipeline
     X_bal, y_bal = None, None
+    y_balanced_dict = None
     counts_before, counts_after = None, None
     resampling_summary = None
 
@@ -612,8 +678,18 @@ def main():
             sample_size=args.sample_size,
             target_majority=args.target_majority,
             target_minority=args.target_minority,
-            k_neighbors=args.k_neighbors
+            k_neighbors=args.k_neighbors,
+            random_state=args.random_state
         )
+
+        # Structured y_balanced dictionary to avoid interface mismatch
+        y_balanced_dict = {
+            'target_encoded': y_bal,
+            'target_tier': args.target_tier,
+            'target_name': np.array([target_rev_map[i] for i in y_bal]),
+            'label_mapping': label_mapping,
+            'category_mapping': category_mapping
+        }
 
         resampling_summary = {
             'strategy': args.strategy,
@@ -624,30 +700,34 @@ def main():
             'target_majority': args.target_majority,
             'target_minority': args.target_minority,
             'k_neighbors': args.k_neighbors,
+            'weight_smoothing': args.weight_smoothing,
             'class_distribution_before': {str(k): int(v) for k, v in counts_before.items()},
-            'class_distribution_after': {str(k): int(v) for k, v in counts_after.items()}
+            'class_distribution_after': {str(k): int(v) for k, v in counts_after.items()},
+            'warning': "Do NOT apply class_weights when training models on X_train_balanced.pkl to avoid double-correction bias."
         }
 
     # Generate Visualizations
     if not args.skip_plots:
-        # Sample 5000 rows for PCA visualization if resampled
         X_pca, y_pca = None, None
         if X_bal is not None:
+            rng = np.random.default_rng(args.random_state)
             n_pca = min(5000, len(y_bal))
-            idx_pca = np.random.choice(len(y_bal), size=n_pca, replace=False)
+            idx_pca = rng.choice(len(y_bal), size=n_pca, replace=False)
             X_pca = X_bal.iloc[idx_pca] if hasattr(X_bal, 'iloc') else X_bal[idx_pca]
             y_pca = y_bal[idx_pca]
 
         generate_visualizations(
             analysis_results, cw_named, cat_named,
-            counts_before, counts_after,
-            X_pca, y_pca,
-            reverse_cat if args.target_tier == 'category' else reverse_label
+            strategy_name=args.strategy,
+            target_tier=args.target_tier,
+            counts_before=counts_before, counts_after=counts_after,
+            X_pca_sample=X_pca, y_pca_sample=y_pca,
+            reverse_map=reverse_cat if args.target_tier == 'category' else reverse_label
         )
 
     # Task 3.3: Save deliverables
     save_artifacts(cw_enc, cw_named, cat_enc, cat_named, bin_w,
-                   preprocessor, X_bal, y_bal, resampling_summary)
+                   preprocessor, X_bal, y_balanced_dict, resampling_summary)
 
     print("\n" + "=" * 80)
     print("PHASE 3 COMPLETED SUCCESSFULLY!")
