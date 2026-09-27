@@ -5,3 +5,4 @@ __pycache__
 .backup_phases_4_to_6/*.tar.gz
 *.pdf
 models/
+plots_backup/

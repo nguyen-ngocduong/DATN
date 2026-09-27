@@ -6,13 +6,15 @@ Graduation Thesis: IoT Attack Detection & Explanation with XAI
 Plan: PLAN.md (Phase 3)
 
 Hardened & Bulletproof Version Addressing:
-1. Guaranteed Ultra-Rare Class Preservation (Prevents classes like Uploading_Attack from vanishing in subsamples)
+1. Proportionally Scaled Guaranteed Minority Preservation:
+   - Uses ratio-scaled threshold (counts * ratio < min_subsample_keep) so rare classes (Malware, Web, BruteForce)
+     retain 100% of their real samples even in large subsampling ratios, avoiding synthetic extrapolation on tiny counts.
 2. Adaptive Fallback for SMOTE (Pre-amplifies classes with n <= k using ROS to guarantee SMOTE k-NN stability)
-3. Synchronized Target Tiers (Supports Category: 9 classes & Fine-Grained: 34 classes with unambiguous y_train_balanced.pkl interface)
-4. Memory-Safe SMOTEENN (Passes explicit sampling_strategy to avoid memory blowup)
-5. Added BorderlineSMOTE Strategy (Targets borderline support vectors in noisy IoT networks)
-6. Optional Weight Smoothing (Caps or sqrt-smooths extreme 1000+ weights to prevent neural net gradient explosion)
-7. Dynamic & Seed-Controlled Visualizations (rng-seeded sampling, tab20/continuous colormaps, dynamic titles)
+3. Dual Class Weight Archiving (Saves both raw inverse-frequency and smoothed weights for rigorous ablation studies)
+4. Synchronized Target Tiers (Supports Fine-Grained: 34 classes & Category: 9 classes with unambiguous y_train_balanced.pkl interface)
+5. Memory-Safe SMOTEENN (Passes explicit sampling_strategy to avoid memory blowup)
+6. Added BorderlineSMOTE Strategy (Targets borderline support vectors in noisy IoT networks)
+7. Matplotlib Clean Formatting (Fixes fixed tick warning, uses rng-seeded sampling, tab20/continuous colormaps, dynamic titles)
 8. Exact Statistical Accounting (34 Fine-Grained Classes: 33 Attacks + Benign; 9 Categories: 8 Groups + Benign)
 """
 
@@ -145,7 +147,7 @@ def compute_all_weights(y_encoded, y_cat_encoded, y_binary, reverse_label_map, r
                         smoothing='none'):
     """
     Task 3.2A: Cost-Sensitive Learning - Inverse Frequency Class Weights
-    Computes exact weights across 3 classification tiers with optional smoothing.
+    Computes and returns BOTH raw inverse-frequency weights and smoothed weights across 3 tiers.
     smoothing: 'none', 'sqrt', 'log', 'cap' (cap max weight at 100)
     """
     print("\n" + "=" * 80)
@@ -164,14 +166,16 @@ def compute_all_weights(y_encoded, y_cat_encoded, y_binary, reverse_label_map, r
     # 1. Fine-grained (34 classes)
     unique_labels = np.unique(y_encoded)
     cw_arr = compute_class_weight('balanced', classes=unique_labels, y=y_encoded)
-    raw_cw_encoded = dict(zip(unique_labels.tolist(), cw_arr.tolist()))
+    raw_cw_encoded = dict(zip(unique_labels.tolist(), [round(float(w), 6) for w in cw_arr]))
+    raw_cw_named = {reverse_label_map[c]: raw_cw_encoded[c] for c in unique_labels}
     cw_encoded = apply_smoothing(raw_cw_encoded, smoothing)
     cw_named = {reverse_label_map[c]: cw_encoded[c] for c in unique_labels}
 
     # 2. Categories (9 groups)
     unique_cats = np.unique(y_cat_encoded)
     cat_arr = compute_class_weight('balanced', classes=unique_cats, y=y_cat_encoded)
-    raw_cat_encoded = dict(zip(unique_cats.tolist(), cat_arr.tolist()))
+    raw_cat_encoded = dict(zip(unique_cats.tolist(), [round(float(w), 6) for w in cat_arr]))
+    raw_cat_named = {reverse_cat_map[c]: raw_cat_encoded[c] for c in unique_cats}
     cat_encoded = apply_smoothing(raw_cat_encoded, smoothing)
     cat_named = {reverse_cat_map[c]: cat_encoded[c] for c in unique_cats}
 
@@ -191,15 +195,16 @@ def compute_all_weights(y_encoded, y_cat_encoded, y_binary, reverse_label_map, r
         print(f"  {cat_name:<15}: weight = {w:8.4f}")
     print(f"Binary weights: Benign (0) = {bin_weights.get(0, 0):.4f}, Attack (1) = {bin_weights.get(1, 0):.4f}")
 
-    return cw_encoded, cw_named, cat_encoded, cat_named, bin_weights
+    return cw_encoded, cw_named, raw_cw_named, cat_encoded, cat_named, raw_cat_named, bin_weights
 
 
-def guaranteed_minority_subsample(X, y, sample_size, min_preserve_threshold=200, random_state=42):
+def guaranteed_minority_subsample(X, y, sample_size, min_subsample_keep=100, random_state=42):
     """
-    Guarantees that ultra-rare classes are NEVER lost or starved during subsampling.
-    Fixes Bug #1:
-    - 100% of samples in classes with <= min_preserve_threshold samples are preserved!
-    - The remaining sample budget is drawn via stratified sampling from the larger classes.
+    Proportionally Scaled Guaranteed Minority Preservation.
+    Fixes Bug #2:
+    - Scales threshold according to ratio = sample_size / total_rows.
+    - Any class whose expected count in the subsample is < min_subsample_keep has 100% of its real instances preserved!
+    - Remaining budget is drawn via stratified sampling from larger classes.
     - Explicit assertion guarantees ZERO classes are dropped.
     """
     total_rows = len(y)
@@ -207,10 +212,12 @@ def guaranteed_minority_subsample(X, y, sample_size, min_preserve_threshold=200,
         return X.copy(), np.array(y)
 
     counts = pd.Series(y).value_counts()
-    rare_classes = counts[counts <= min_preserve_threshold].index.tolist()
+    ratio = sample_size / total_rows
+    # Identify classes where stratified sampling would result in fewer than min_subsample_keep real samples
+    rare_classes = counts[(counts * ratio) < min_subsample_keep].index.tolist()
     
     if rare_classes:
-        print(f"  [Safety Guard] Preserving 100% of samples for {len(rare_classes)} ultra-rare classes (<= {min_preserve_threshold} samples)...")
+        print(f"  [Safety Guard] Preserving 100% of samples for {len(rare_classes)} rare classes (expected < {min_subsample_keep} in {sample_size:,} subsample)...")
         y_series = pd.Series(y)
         rare_indices = y_series[y_series.isin(rare_classes)].index.values
         common_indices = y_series[~y_series.isin(rare_classes)].index.values
@@ -232,10 +239,11 @@ def guaranteed_minority_subsample(X, y, sample_size, min_preserve_threshold=200,
         else:
             X_sub_com, y_sub_com = X_common, y_common
 
+        feat_cols = X.columns if hasattr(X, 'columns') else None
         if hasattr(X, 'iloc'):
             X_sub = pd.concat([X_rare, X_sub_com], axis=0).reset_index(drop=True)
         else:
-            X_sub = pd.DataFrame(np.vstack([X_rare, X_sub_com]))
+            X_sub = pd.DataFrame(np.vstack([X_rare, X_sub_com]), columns=feat_cols)
         y_sub = np.concatenate([y_rare, y_sub_com])
     else:
         _, X_sub, _, y_sub = train_test_split(
@@ -257,7 +265,7 @@ def guaranteed_minority_subsample(X, y, sample_size, min_preserve_threshold=200,
 
 def adaptive_smote_pre_ros(X_work, y_work, strategy_over, k_neighbors=5, random_state=42):
     """
-    Fixes Bug: Adaptive ROS fallback when a class has n <= k_neighbors.
+    Adaptive ROS fallback when a class has n <= k_neighbors.
     SMOTE requires at least k+1 samples to form k nearest neighbors.
     Pre-amplifies ultra-rare classes with RandomOverSampler up to k+2 samples so SMOTE never crashes!
     """
@@ -277,6 +285,7 @@ def adaptive_smote_pre_ros(X_work, y_work, strategy_over, k_neighbors=5, random_
 
 def apply_resampling_pipeline(X_train, y_target, reverse_map,
                               strategy='hybrid', sample_size=150000,
+                              min_subsample_keep=100,
                               target_majority=30000, target_minority=8000,
                               k_neighbors=5, random_state=42):
     """
@@ -291,9 +300,9 @@ def apply_resampling_pipeline(X_train, y_target, reverse_map,
     print(f"TASK 3.2B: RESAMPLING PIPELINE [Strategy: {strategy.upper()}]")
     print("=" * 80)
 
-    # Guaranteed minority preservation during subsampling
+    # Proportionally scaled guaranteed minority preservation during subsampling
     X_sub, y_sub = guaranteed_minority_subsample(
-        X_train, y_target, sample_size=sample_size, random_state=random_state
+        X_train, y_target, sample_size=sample_size, min_subsample_keep=min_subsample_keep, random_state=random_state
     )
 
     counts_before = pd.Series(y_sub).value_counts()
@@ -392,12 +401,13 @@ def apply_resampling_pipeline(X_train, y_target, reverse_map,
 
 
 def generate_visualizations(analysis_results, class_weights_named, cat_weights_named,
-                            strategy_name='Hybrid', target_tier='category',
+                            strategy_name='Hybrid', target_tier='label',
                             counts_before=None, counts_after=None,
                             X_pca_sample=None, y_pca_sample=None, reverse_map=None):
     """
     Generate all Phase 3 publication-ready plots.
     Fixes:
+    - Sets explicit ticks before set_xticklabels (fixes matplotlib warning)
     - Dynamic titles reflecting strategy and tier
     - Seed-controlled PCA sampling with rng
     - Tab20/continuous colormaps for fine-grained 34 classes
@@ -475,6 +485,7 @@ def generate_visualizations(analysis_results, class_weights_named, cat_weights_n
     bars_cat = ax2.bar(cat_names, cat_vals, color='#3498db', edgecolor='black', linewidth=0.8, width=0.55)
     ax2.set_ylabel('Category Weight Value', fontsize=11, fontweight='bold')
     ax2.set_title('Inverse Frequency Category Weights (8 Attack Groups + Benign = 9 Classes)', fontsize=12, fontweight='bold')
+    ax2.set_xticks(range(len(cat_names)))  # Fix: explicit ticks before set_xticklabels
     ax2.set_xticklabels(cat_names, rotation=35, ha='right', fontsize=10, fontweight='bold')
     ax2.grid(True, linestyle='--', alpha=0.5, axis='y')
     for bar, val in zip(bars_cat, cat_vals):
@@ -559,11 +570,13 @@ def generate_visualizations(analysis_results, class_weights_named, cat_weights_n
             print(f"  Warning: Could not generate PCA plot: {e}")
 
 
-def save_artifacts(cw_encoded, cw_named, cat_encoded, cat_named, bin_weights,
+def save_artifacts(cw_encoded, cw_named, raw_cw_named,
+                   cat_encoded, cat_named, raw_cat_named, bin_weights,
                    preprocessor, X_balanced=None, y_balanced_dict=None,
-                   resampling_summary=None):
+                   resampling_summary=None, smoothing='none'):
     """
     Task 3.3: Save all deliverables into models/ and data/
+    Saves BOTH raw and smoothed weights for rigorous ablation study.
     """
     print("\n" + "=" * 80)
     print("TASK 3.3: SERIALIZING DELIVERABLES")
@@ -571,13 +584,16 @@ def save_artifacts(cw_encoded, cw_named, cat_encoded, cat_named, bin_weights,
     os.makedirs('data', exist_ok=True)
     os.makedirs('models', exist_ok=True)
 
-    # 1. Save Class Weights dictionaries
+    # 1. Save Class Weights dictionaries (both smoothed and raw)
     all_weights = {
         'fine_grained_encoded': cw_encoded,
         'fine_grained_named': cw_named,
+        'fine_grained_raw': raw_cw_named,
         'category_encoded': cat_encoded,
         'category_named': cat_named,
-        'binary': bin_weights
+        'category_raw': raw_cat_named,
+        'binary': bin_weights,
+        'smoothing_mode': smoothing
     }
     joblib.dump(all_weights, 'data/class_weights.pkl')
     joblib.dump(all_weights, 'class_weights.pkl')
@@ -585,9 +601,12 @@ def save_artifacts(cw_encoded, cw_named, cat_encoded, cat_named, bin_weights,
 
     # 2. Save JSON format for human readability
     weights_json = {
-        'fine_grained': cw_named,
-        'categories': cat_named,
-        'binary': {str(k): v for k, v in bin_weights.items()}
+        'fine_grained_smoothed': cw_named,
+        'fine_grained_raw': raw_cw_named,
+        'categories_smoothed': cat_named,
+        'categories_raw': raw_cat_named,
+        'binary': {str(k): v for k, v in bin_weights.items()},
+        'smoothing_mode': smoothing
     }
     with open('models/class_weights.json', 'w') as f:
         json.dump(weights_json, f, indent=4)
@@ -598,6 +617,7 @@ def save_artifacts(cw_encoded, cw_named, cat_encoded, cat_named, bin_weights,
     preprocessor['class_weights_named'] = cw_named
     preprocessor['category_weights_encoded'] = cat_encoded
     preprocessor['binary_weights'] = bin_weights
+    preprocessor['class_weights_raw'] = raw_cw_named
     joblib.dump(preprocessor, 'models/preprocessor.joblib')
     print("  [Updated] models/preprocessor.joblib")
 
@@ -619,11 +639,13 @@ def main():
     parser.add_argument('--strategy', type=str, default='hybrid',
                         choices=['hybrid', 'smotetomek', 'borderlinesmote', 'smote', 'smoteenn', 'weights_only'],
                         help="Resampling strategy: 'hybrid' (Scalable IoT), 'smotetomek', 'borderlinesmote', 'smote', 'smoteenn', 'weights_only'")
-    parser.add_argument('--target-tier', type=str, default='category',
-                        choices=['category', 'label'],
-                        help="Target tier: 'category' (9 classes: 8 attack groups + Benign) or 'label' (34 fine-grained classes)")
+    parser.add_argument('--target-tier', type=str, default='label',
+                        choices=['label', 'category'],
+                        help="Target tier: 'label' (34 fine-grained classes) or 'category' (9 classes: 8 attack groups + Benign)")
     parser.add_argument('--sample-size', type=int, default=150000,
                         help="Sample size before resampling with guaranteed minority preservation (default: 150000)")
+    parser.add_argument('--min-keep', type=int, default=100,
+                        help="Minimum expected samples threshold to guarantee full (100%%) preservation (default: 100)")
     parser.add_argument('--target-majority', type=int, default=30000,
                         help="Max samples per majority class after pruning (default: 30000)")
     parser.add_argument('--target-minority', type=int, default=8000,
@@ -633,11 +655,25 @@ def main():
     parser.add_argument('--weight-smoothing', type=str, default='none',
                         choices=['none', 'sqrt', 'log', 'cap'],
                         help="Class weight smoothing mode: 'none', 'sqrt', 'log', 'cap' (cap at 100)")
+    parser.add_argument('--output-dir', type=str, default=None,
+                        help="Thư mục làm việc/lưu trữ kết quả (Mặc định: auto-detect '/content/drive/MyDrive/do_an' nếu trên Colab, hoặc '.')")
     parser.add_argument('--random-state', type=int, default=42,
                         help="Random seed for reproducibility")
     parser.add_argument('--skip-plots', action='store_true',
                         help="Skip generating visualization plots")
     args = parser.parse_args()
+
+    # 🎯 Redirect working directory to Google Drive if in Colab or if custom output-dir is given
+    target_dir = args.output_dir
+    if not target_dir and os.path.exists('/content/drive/MyDrive/do_an'):
+        target_dir = '/content/drive/MyDrive/do_an'
+    if target_dir:
+        os.makedirs(target_dir, exist_ok=True)
+        os.chdir(target_dir)
+        print(f"🚀 Working directory redirected to: {os.getcwd()}")
+        os.makedirs('data', exist_ok=True)
+        os.makedirs('models', exist_ok=True)
+        os.makedirs('plots', exist_ok=True)
 
     # Step 1: Load Data
     X_train, y_train_dict, preprocessor = load_phase2_data()
@@ -657,7 +693,7 @@ def main():
     analysis_results = analyze_imbalance(y_names, y_cat_names, label_mapping, category_mapping)
 
     # Task 3.2A: Compute Class Weights (Always executed)
-    cw_enc, cw_named, cat_enc, cat_named, bin_w = compute_all_weights(
+    cw_enc, cw_named, raw_cw_named, cat_enc, cat_named, raw_cat_named, bin_w = compute_all_weights(
         y_encoded, y_cat_encoded, y_binary, reverse_label, reverse_cat,
         smoothing=args.weight_smoothing
     )
@@ -669,13 +705,14 @@ def main():
     resampling_summary = None
 
     if args.strategy != 'weights_only':
-        target_series = y_cat_encoded if args.target_tier == 'category' else y_encoded
-        target_rev_map = reverse_cat if args.target_tier == 'category' else reverse_label
+        target_series = y_encoded if args.target_tier == 'label' else y_cat_encoded
+        target_rev_map = reverse_label if args.target_tier == 'label' else reverse_cat
 
         X_bal, y_bal, counts_before, counts_after, elapsed = apply_resampling_pipeline(
             X_train, target_series, target_rev_map,
             strategy=args.strategy,
             sample_size=args.sample_size,
+            min_subsample_keep=args.min_keep,
             target_majority=args.target_majority,
             target_minority=args.target_minority,
             k_neighbors=args.k_neighbors,
@@ -695,6 +732,7 @@ def main():
             'strategy': args.strategy,
             'target_tier': args.target_tier,
             'initial_sample_size': args.sample_size,
+            'min_keep_threshold': args.min_keep,
             'final_sample_size': len(y_bal),
             'execution_time_seconds': round(elapsed, 2),
             'target_majority': args.target_majority,
@@ -722,12 +760,14 @@ def main():
             target_tier=args.target_tier,
             counts_before=counts_before, counts_after=counts_after,
             X_pca_sample=X_pca, y_pca_sample=y_pca,
-            reverse_map=reverse_cat if args.target_tier == 'category' else reverse_label
+            reverse_map=reverse_label if args.target_tier == 'label' else reverse_cat
         )
 
     # Task 3.3: Save deliverables
-    save_artifacts(cw_enc, cw_named, cat_enc, cat_named, bin_w,
-                   preprocessor, X_bal, y_balanced_dict, resampling_summary)
+    save_artifacts(cw_enc, cw_named, raw_cw_named,
+                   cat_enc, cat_named, raw_cat_named, bin_w,
+                   preprocessor, X_bal, y_balanced_dict, resampling_summary,
+                   smoothing=args.weight_smoothing)
 
     print("\n" + "=" * 80)
     print("PHASE 3 COMPLETED SUCCESSFULLY!")
