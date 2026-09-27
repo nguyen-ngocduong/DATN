@@ -1,0 +1,20 @@
+[2026-09-27 16:20:31,975] INFO: ===========================================================================
+[2026-09-27 16:20:31,975] INFO: STARTING EXPERIMENT: [exp_003_decision_tree_baseline]
+[2026-09-27 16:20:31,975] INFO: Method: Decision Tree Baseline
+[2026-09-27 16:20:31,975] INFO: Description: Decision Tree baseline classifier (Level 1 base model from paper)
+[2026-09-27 16:20:31,975] INFO: ===========================================================================
+[2026-09-27 16:20:31,975] INFO: Training Decision Tree Baseline on 204,412 samples...
+[2026-09-27 16:20:36,434] INFO: Training completed in 4.46 seconds.
+[2026-09-27 16:20:36,435] INFO: Predicting on 51,103 test samples...
+[2026-09-27 16:20:36,442] INFO: Inference completed in 0.0076 seconds.
+[2026-09-27 16:20:36,721] INFO: Accuracy:    81.16%
+[2026-09-27 16:20:36,722] INFO: ROC-AUC:     0.9661
+[2026-09-27 16:20:36,722] INFO: Precision:   72.52%
+[2026-09-27 16:20:36,722] INFO: Recall:      80.38%
+[2026-09-27 16:20:36,722] INFO: F1 (Macro):  74.68%
+[2026-09-27 16:20:36,722] INFO: F1 (Wtd):    82.18%
+[2026-09-27 16:20:36,740] INFO: Model checkpoint saved to: phase5_experiments/exp_003_decision_tree_baseline/model/model.pkl
+[2026-09-27 16:20:37,200] INFO: Confusion matrix saved to: phase5_experiments/exp_003_decision_tree_baseline/metrics/confusion_matrix.png
+[2026-09-27 16:20:37,202] INFO: Experiment config saved to: phase5_experiments/exp_003_decision_tree_baseline/config.yaml
+[2026-09-27 16:20:37,359] INFO: Experiment [exp_003_decision_tree_baseline] completed successfully!
+

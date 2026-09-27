@@ -1,0 +1,17 @@
+=== CLASSIFICATION REPORT: [VALIDATION] ===
+Samples: 26,706 | Accuracy: 95.97% | F1-Macro: 92.21%
+
+              precision    recall  f1-score   support
+
+  BruteForce     0.8108    0.8727    0.8406       707
+        DDoS     0.9992    0.9952    0.9972     10121
+         DoS     0.9987    0.9971    0.9979      3115
+       Mirai     1.0000    0.9954    0.9977      2390
+      Normal     0.7260    0.8958    0.8020       710
+       Recon     0.9601    0.8880    0.9227      3768
+    Spoofing     0.9243    0.8592    0.8905      1477
+   Web-Based     0.9059    0.9518    0.9283      4418
+
+    accuracy                         0.9597     26706
+   macro avg     0.9156    0.9319    0.9221     26706
+weighted avg     0.9619    0.9597    0.9602     26706

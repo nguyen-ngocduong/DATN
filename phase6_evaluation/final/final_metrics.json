@@ -1,0 +1,15 @@
+{
+    "champion_eval_id": "eval_005",
+    "model_name": "XGBoost / Gradient Boosting Tuned",
+    "model_class": "HistGradientBoostingClassifier",
+    "val_metrics": {
+        "accuracy": 0.9702,
+        "f1_macro": 0.9391,
+        "roc_auc": 0.9986
+    },
+    "final_test_metrics": {
+        "accuracy": 0.9693,
+        "f1_macro": 0.937,
+        "roc_auc": 0.9986
+    }
+}

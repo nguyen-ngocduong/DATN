@@ -1,0 +1,20 @@
+[2026-09-27 16:21:57,040] INFO: ===========================================================================
+[2026-09-27 16:21:57,040] INFO: STARTING EXPERIMENT: [exp_005_xgboost_tuned]
+[2026-09-27 16:21:57,040] INFO: Method: XGBoost / Gradient Boosting Tuned
+[2026-09-27 16:21:57,040] INFO: Description: Hyperparameter-tuned boosting model with deeper depth=6 and 150 iterations
+[2026-09-27 16:21:57,040] INFO: ===========================================================================
+[2026-09-27 16:21:57,040] INFO: Training XGBoost / Gradient Boosting Tuned on 204,412 samples...
+[2026-09-27 16:22:31,023] INFO: Training completed in 33.98 seconds.
+[2026-09-27 16:22:31,023] INFO: Predicting on 51,103 test samples...
+[2026-09-27 16:22:31,990] INFO: Inference completed in 0.9669 seconds.
+[2026-09-27 16:22:33,316] INFO: Accuracy:    87.06%
+[2026-09-27 16:22:33,316] INFO: ROC-AUC:     0.9926
+[2026-09-27 16:22:33,316] INFO: Precision:   81.97%
+[2026-09-27 16:22:33,316] INFO: Recall:      88.01%
+[2026-09-27 16:22:33,316] INFO: F1 (Macro):  84.06%
+[2026-09-27 16:22:33,317] INFO: F1 (Wtd):    87.60%
+[2026-09-27 16:22:33,724] INFO: Model checkpoint saved to: phase5_experiments/exp_005_xgboost_tuned/model/model.pkl
+[2026-09-27 16:22:34,325] INFO: Confusion matrix saved to: phase5_experiments/exp_005_xgboost_tuned/metrics/confusion_matrix.png
+[2026-09-27 16:22:34,327] INFO: Experiment config saved to: phase5_experiments/exp_005_xgboost_tuned/config.yaml
+[2026-09-27 16:22:34,504] INFO: Experiment [exp_005_xgboost_tuned] completed successfully!
+

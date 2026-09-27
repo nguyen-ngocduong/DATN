@@ -1,0 +1,11 @@
+{
+    "single_sample_latency_ms": {
+        "mean": 11.1172,
+        "median_p50": 10.5092,
+        "p95": 13.9934
+    },
+    "batch_performance": {
+        "throughput_samples_per_sec": 9063.7,
+        "batch_ms_per_sample": 0.1103
+    }
+}

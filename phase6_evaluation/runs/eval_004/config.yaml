@@ -1,0 +1,33 @@
+evaluation:
+  id: eval_004
+  date: '2026-09-27'
+  timestamp: '2026-09-27T09:58:09.504637'
+model:
+  experiment_id: exp_004_ensemble_blending_paper
+  name: Ensemble Blending Model
+  model_path: /content/drive/MyDrive/do_an/phase5_experiments/exp_004_ensemble_blending_paper/model/model.pkl
+  hyperparameters:
+    voting: soft
+    estimators:
+    - Decision Tree
+    - Random Forest
+    - Gradient Boosting
+    rule: avg_prob = (p_DT + p_RF + p_GB) / 3
+dataset:
+  name: CICIoT2023
+  classes: 8
+  val_samples: 26706
+  test_samples: 26707
+evaluation_sets:
+  validation: true
+  test: true
+metrics:
+- accuracy
+- precision
+- recall
+- f1_macro
+- f1_weighted
+- roc_auc
+- confusion_matrix
+- inference_latency
+random_seed: 42

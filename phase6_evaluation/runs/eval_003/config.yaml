@@ -1,0 +1,32 @@
+evaluation:
+  id: eval_003
+  date: '2026-09-27'
+  timestamp: '2026-09-27T09:57:43.468626'
+model:
+  experiment_id: exp_003_decision_tree_baseline
+  name: Decision Tree Baseline
+  model_path: /content/drive/MyDrive/do_an/phase5_experiments/exp_003_decision_tree_baseline/model/model.pkl
+  hyperparameters:
+    max_depth: 16
+    min_samples_split: 10
+    min_samples_leaf: 4
+    class_weight: balanced
+    random_state: 123
+dataset:
+  name: CICIoT2023
+  classes: 8
+  val_samples: 26706
+  test_samples: 26707
+evaluation_sets:
+  validation: true
+  test: true
+metrics:
+- accuracy
+- precision
+- recall
+- f1_macro
+- f1_weighted
+- roc_auc
+- confusion_matrix
+- inference_latency
+random_seed: 42

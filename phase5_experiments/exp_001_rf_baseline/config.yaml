@@ -1,0 +1,42 @@
+experiment_id: exp_001_rf_baseline
+experiment_name: Random Forest Baseline
+description: Random Forest baseline with 100 estimators matching IEEE paper Section
+  III
+timestamp_start: '2026-09-27T16:19:51.500254'
+timestamp_end: '2026-09-27T16:20:04.738838'
+total_duration_sec: 13.24
+method: Random Forest Baseline
+task: 8-Class IoT Attack Classification (IEEE Access CICIoT2023)
+hyperparameters:
+  n_estimators: 100
+  max_depth: 16
+  min_samples_split: 8
+  min_samples_leaf: 3
+  class_weight: balanced
+  random_state: 123
+  n_jobs: -1
+data:
+  features_count: 25
+  train_samples: 204412
+  test_samples: 51103
+  classes:
+  - BruteForce
+  - DDoS
+  - DoS
+  - Mirai
+  - Normal
+  - Recon
+  - Spoofing
+  - Web-Based
+metrics_summary:
+  experiment_id: exp_001_rf_baseline
+  method: Random Forest Baseline
+  accuracy: 0.8615
+  roc_auc_ovr_macro: 0.9919
+  precision_macro: 0.815
+  recall_macro: 0.8713
+  f1_macro: 0.8326
+  f1_weighted: 0.8671
+  training_time_sec: 10.6077
+  testing_time_sec: 0.1556
+  test_samples: 51103

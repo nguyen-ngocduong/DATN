@@ -1,0 +1,32 @@
+evaluation:
+  id: eval_002
+  date: '2026-09-27'
+  timestamp: '2026-09-27T09:57:36.526528'
+model:
+  experiment_id: exp_002_xgboost_baseline
+  name: Gradient Boosting Baseline
+  model_path: /content/drive/MyDrive/do_an/phase5_experiments/exp_002_xgboost_baseline/model/model.pkl
+  hyperparameters:
+    learning_rate: 0.1
+    max_iter: 100
+    max_depth: 3
+    class_weight: balanced
+    random_state: 123
+dataset:
+  name: CICIoT2023
+  classes: 8
+  val_samples: 26706
+  test_samples: 26707
+evaluation_sets:
+  validation: true
+  test: true
+metrics:
+- accuracy
+- precision
+- recall
+- f1_macro
+- f1_weighted
+- roc_auc
+- confusion_matrix
+- inference_latency
+random_seed: 42
