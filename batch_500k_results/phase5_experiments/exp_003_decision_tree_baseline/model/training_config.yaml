@@ -1,0 +1,11 @@
+experiment_id: exp_003_decision_tree_baseline
+model_name: Decision Tree Baseline
+model_class: DecisionTreeClassifier
+hyperparameters:
+  max_depth: 16
+  min_samples_split: 10
+  min_samples_leaf: 4
+  class_weight: balanced
+  random_state: 123
+training_time_seconds: 17.4267
+timestamp: '2026-09-28T14:09:02.963712'

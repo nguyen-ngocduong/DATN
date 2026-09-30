@@ -1,0 +1,16 @@
+champion_eval_id: eval_005_exp_005_xgboost_tuned
+source_phase5_experiment: exp_005_xgboost_tuned
+model_name: XGBoost / Gradient Boosting Tuned
+model_class: HistGradientBoostingClassifier
+selection_criterion: Highest Validation F1-Score (0.9391) & Highest Test Accuracy (0.9693)
+validation_metrics:
+  accuracy: 0.9702
+  f1_macro: 0.9391
+  roc_auc: 0.9986
+final_test_metrics:
+  accuracy: 0.9693
+  f1_macro: 0.9370
+  roc_auc: 0.9986
+  latency_ms_per_sample: 10.5092
+  throughput_samples_per_sec: 9063.7
+selected_at: '2026-09-27T17:03:00'

@@ -1,0 +1,29 @@
+feature_selection:
+  method: Multi-Stage (VarianceThreshold + CorrelationFiltering + FeatureImportance)
+  k_features: 25
+  features_selected:
+  - fin_flag_number
+  - IAT
+  - ICMP
+  - syn_flag_number
+  - AVG
+  - Tot size
+  - psh_flag_number
+  - Protocol Type
+  - Header_Length
+  - header_to_payload_ratio
+  - total_counts
+  - Min
+  - UDP
+  - avg_packet_size
+  - HTTP
+  - fin_count
+  - ack_count
+  - urg_count
+  - syn_count
+  - remote_access
+  - Variance
+  - flow_duration
+  - transport_traffic
+  - duration_ratio
+  - Rate

@@ -1,0 +1,5 @@
+scaler: RobustScaler
+log_transform: np.log1p
+missing_value_imputation: median
+categorical_encoding: Row Hashing SHA-256 (hash_feature_1 .. hash_feature_4)
+random_state: 123

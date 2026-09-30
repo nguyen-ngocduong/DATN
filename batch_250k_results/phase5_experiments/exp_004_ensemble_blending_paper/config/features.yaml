@@ -1,0 +1,29 @@
+feature_selection:
+  method: Multi-Stage (VarianceThreshold + CorrelationFiltering + FeatureImportance)
+  k_features: 25
+  features_selected:
+  - Header_Length
+  - Duration
+  - Rate
+  - Srate
+  - Drate
+  - Fin_Flag_Number
+  - Syn_Flag_Number
+  - Rst_Flag_Number
+  - Psh_Flag_Number
+  - Ack_Flag_Number
+  - Ece_Flag_Number
+  - Cwr_Flag_Number
+  - Ack_Count
+  - Syn_Count
+  - Fin_Count
+  - Rst_Count
+  - HTTP
+  - HTTPS
+  - DNS
+  - Telnet
+  - SMTP
+  - SSH
+  - IRC
+  - TCP
+  - UDP

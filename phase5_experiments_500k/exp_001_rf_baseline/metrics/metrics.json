@@ -1,0 +1,13 @@
+{
+    "experiment_id": "exp_001_rf_baseline",
+    "method": "Random Forest Baseline",
+    "accuracy": 0.9602,
+    "roc_auc_ovr_macro": 0.9975,
+    "precision_macro": 0.9164,
+    "recall_macro": 0.9326,
+    "f1_macro": 0.9227,
+    "f1_weighted": 0.9607,
+    "training_time_sec": 92.6666,
+    "testing_time_sec": 1.1168,
+    "test_samples": 53413
+}

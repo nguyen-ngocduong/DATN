@@ -1,0 +1,19 @@
+{
+    "selected_at": "2026-09-28T14:21:21.245212",
+    "champion_eval_id": "eval_005_exp_005_xgboost_tuned",
+    "source_phase5_experiment": "exp_005_xgboost_tuned",
+    "model_name": "exp_005_xgboost_tuned",
+    "model_class": "HistGradientBoostingClassifier",
+    "selection_criterion": "Highest Validation F1-Score (Strict Zero Leakage)",
+    "validation_metrics": {
+        "accuracy": 0.9748,
+        "f1_macro": 0.9448,
+        "roc_auc": 0.9988
+    },
+    "final_test_metrics": {
+        "accuracy": 0.9753,
+        "f1_macro": 0.9467,
+        "roc_auc": 0.9988,
+        "latency_ms_per_sample": 14.9256
+    }
+}

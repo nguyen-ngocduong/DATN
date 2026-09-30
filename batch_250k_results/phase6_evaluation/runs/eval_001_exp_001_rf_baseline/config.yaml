@@ -1,0 +1,34 @@
+evaluation:
+  id: eval_001_exp_001_rf_baseline
+  date: '2026-09-27'
+  timestamp: '2026-09-27T09:56:29.316159'
+model:
+  experiment_id: exp_001_rf_baseline
+  name: Random Forest Baseline
+  model_path: /content/drive/MyDrive/do_an/phase5_experiments/exp_001_rf_baseline/model/model.pkl
+  hyperparameters:
+    n_estimators: 100
+    max_depth: 16
+    min_samples_split: 8
+    min_samples_leaf: 3
+    class_weight: balanced
+    random_state: 123
+    n_jobs: -1
+dataset:
+  name: CICIoT2023
+  classes: 8
+  val_samples: 26706
+  test_samples: 26707
+evaluation_sets:
+  validation: true
+  test: true
+metrics:
+- accuracy
+- precision
+- recall
+- f1_macro
+- f1_weighted
+- roc_auc
+- confusion_matrix
+- inference_latency
+random_seed: 42

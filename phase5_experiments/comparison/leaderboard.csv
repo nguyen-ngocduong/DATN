@@ -1,0 +1,6 @@
+experiment_id,method,accuracy,roc_auc_ovr_macro,precision_macro,recall_macro,f1_macro,f1_weighted,training_time_sec,testing_time_sec,test_samples
+exp_005_xgboost_tuned,XGBoost / Gradient Boosting Tuned,0.9698,0.9986,0.9286,0.9494,0.938,0.9701,61.1845,7.5268,53413
+exp_001_rf_baseline,Random Forest Baseline,0.9602,0.9975,0.9164,0.9326,0.9227,0.9607,94.7823,1.0391,53413
+exp_004_ensemble_blending_paper,Ensemble Blending (RF + GB),0.9533,0.9969,0.8954,0.9258,0.9071,0.9542,106.27,4.1117,53413
+exp_003_decision_tree_baseline,Decision Tree Baseline,0.9354,0.9913,0.8665,0.9051,0.8793,0.9371,9.6023,0.0087,53413
+exp_002_xgboost_baseline,Gradient Boosting Baseline,0.9336,0.9951,0.8569,0.9023,0.873,0.9354,29.6554,3.1997,53413

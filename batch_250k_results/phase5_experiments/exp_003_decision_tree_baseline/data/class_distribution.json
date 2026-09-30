@@ -1,0 +1,70 @@
+{
+    "train_distribution": {
+        "BruteForce": {
+            "count": 5476,
+            "pct": 2.68
+        },
+        "DDoS": {
+            "count": 80173,
+            "pct": 39.22
+        },
+        "DoS": {
+            "count": 24280,
+            "pct": 11.88
+        },
+        "Mirai": {
+            "count": 18799,
+            "pct": 9.2
+        },
+        "Normal": {
+            "count": 5124,
+            "pct": 2.51
+        },
+        "Recon": {
+            "count": 29005,
+            "pct": 14.19
+        },
+        "Spoofing": {
+            "count": 10081,
+            "pct": 4.93
+        },
+        "Web-Based": {
+            "count": 31474,
+            "pct": 15.4
+        }
+    },
+    "test_distribution": {
+        "BruteForce": {
+            "count": 1369,
+            "pct": 2.68
+        },
+        "DDoS": {
+            "count": 20043,
+            "pct": 39.22
+        },
+        "DoS": {
+            "count": 6070,
+            "pct": 11.88
+        },
+        "Mirai": {
+            "count": 4700,
+            "pct": 9.2
+        },
+        "Normal": {
+            "count": 1281,
+            "pct": 2.51
+        },
+        "Recon": {
+            "count": 7252,
+            "pct": 14.19
+        },
+        "Spoofing": {
+            "count": 2520,
+            "pct": 4.93
+        },
+        "Web-Based": {
+            "count": 7868,
+            "pct": 15.4
+        }
+    }
+}

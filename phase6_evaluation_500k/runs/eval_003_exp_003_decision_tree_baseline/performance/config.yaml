@@ -1,0 +1,5 @@
+benchmark:
+  batch_size: 1000
+  n_batches: 10
+  warmup_runs: 2
+  device: cpu

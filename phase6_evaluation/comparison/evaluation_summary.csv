@@ -1,6 +1,6 @@
 Eval ID,Phase 5 Experiment,Model Name,Val Acc,Val F1-Macro,Val ROC-AUC,Test Acc,Test F1-Macro,Test ROC-AUC,Latency Median (ms),Throughput (samples/s)
-eval_005,exp_005_xgboost_tuned,XGBoost / Gradient Boosting Tuned,0.9702,0.9391,0.9986,0.9693,0.937,0.9986,10.5092,9063.7
-eval_001,exp_001_rf_baseline,Random Forest Baseline,0.9597,0.9221,0.9976,0.9607,0.9234,0.9974,24.4103,81137.05
-eval_004,exp_004_ensemble_blending_paper,Ensemble Blending Model,0.9515,0.9043,0.997,0.9519,0.9043,0.9969,36.4926,21688.79
-eval_003,exp_003_decision_tree_baseline,Decision Tree Baseline,0.9359,0.8794,0.9913,0.935,0.8793,0.9914,0.7701,5674926.8
-eval_002,exp_002_xgboost_baseline,Gradient Boosting Baseline,0.9348,0.8749,0.995,0.9324,0.8712,0.9951,7.0118,24938.92
+eval_005_exp_005_xgboost_tuned,exp_005_xgboost_tuned,XGBoost / Gradient Boosting Tuned,0.9705,0.9403,0.9987,0.969,0.9357,0.9985,15.112033500145117,66.17243139319386
+eval_001_exp_001_rf_baseline,exp_001_rf_baseline,Random Forest Baseline,0.9594,0.922,0.9976,0.961,0.9234,0.9973,34.86539450000237,28.68173483595409
+eval_004_exp_004_ensemble_blending_paper,exp_004_ensemble_blending_paper,Ensemble Blending (RF + GB),0.9534,0.9079,0.9971,0.9532,0.9064,0.9967,41.73980049995407,23.957948720936038
+eval_003_exp_003_decision_tree_baseline,exp_003_decision_tree_baseline,Decision Tree Baseline,0.9357,0.8803,0.9919,0.9351,0.8782,0.9908,0.1648659999773372,6065.532008646185
+eval_002_exp_002_xgboost_baseline,exp_002_xgboost_baseline,Gradient Boosting Baseline,0.9342,0.8747,0.9953,0.9329,0.8714,0.9948,9.666407499935303,103.45104942106909

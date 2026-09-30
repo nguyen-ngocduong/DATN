@@ -1,0 +1,43 @@
+dataset: CICIoT2023
+features_count: 25
+features_list:
+- fin_flag_number
+- ICMP
+- Tot size
+- syn_flag_number
+- header_to_payload_ratio
+- psh_flag_number
+- Min
+- Header_Length
+- Tot sum
+- Protocol Type
+- total_counts
+- remote_access
+- UDP
+- flow_duration
+- ack_count
+- TCP
+- rst_syn_ratio
+- Srate
+- Variance
+- fin_count
+- HTTP
+- Covariance
+- syn_ack_ratio
+- Radius
+- syn_count
+train_samples: 204412
+test_samples: 51103
+classes_count: 8
+classes:
+- BruteForce
+- DDoS
+- DoS
+- Mirai
+- Normal
+- Recon
+- Spoofing
+- Web-Based
+random_seed: 123
+test_split_ratio: 0.2
+stratified: true

@@ -1,0 +1,13 @@
+experiment_id: exp_001_rf_baseline
+model_name: Random Forest Baseline
+model_class: RandomForestClassifier
+hyperparameters:
+  n_estimators: 100
+  max_depth: 16
+  min_samples_split: 8
+  min_samples_leaf: 3
+  class_weight: balanced
+  random_state: 123
+  n_jobs: -1
+training_time_seconds: 92.6666
+timestamp: '2026-09-27T16:34:24.726050'

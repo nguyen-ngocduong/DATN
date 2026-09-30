@@ -1,0 +1,13 @@
+{
+    "best_experiment_id": "exp_005_xgboost_tuned",
+    "method": "XGBoost / Gradient Boosting Tuned",
+    "selected_at": "2026-09-27T16:22:00",
+    "selection_criterion": "Highest Accuracy (87.06%) & Highest Macro F1 (84.06%) on Test Split",
+    "metrics": {
+        "accuracy": 0.8706,
+        "f1_macro": 0.8406,
+        "roc_auc": 0.9926,
+        "precision_macro": 0.8197,
+        "recall_macro": 0.8801
+    }
+}

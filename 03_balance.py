@@ -573,7 +573,7 @@ def generate_visualizations(analysis_results, class_weights_named, cat_weights_n
 def save_artifacts(cw_encoded, cw_named, raw_cw_named,
                    cat_encoded, cat_named, raw_cat_named, bin_weights,
                    preprocessor, X_balanced=None, y_balanced_dict=None,
-                   resampling_summary=None, smoothing='none'):
+                   resampling_summary=None, smoothing='none', batch_suffix=None):
     """
     Task 3.3: Save all deliverables into models/ and data/
     Saves BOTH raw and smoothed weights for rigorous ablation study.
@@ -583,6 +583,8 @@ def save_artifacts(cw_encoded, cw_named, raw_cw_named,
     print("=" * 80)
     os.makedirs('data', exist_ok=True)
     os.makedirs('models', exist_ok=True)
+
+    suffix = f"_{batch_suffix}" if batch_suffix else ""
 
     # 1. Save Class Weights dictionaries (both smoothed and raw)
     all_weights = {
@@ -595,9 +597,9 @@ def save_artifacts(cw_encoded, cw_named, raw_cw_named,
         'binary': bin_weights,
         'smoothing_mode': smoothing
     }
+    joblib.dump(all_weights, f'data/class_weights{suffix}.pkl')
     joblib.dump(all_weights, 'data/class_weights.pkl')
-    joblib.dump(all_weights, 'class_weights.pkl')
-    print("  [Saved] data/class_weights.pkl & class_weights.pkl")
+    print(f"  [Saved] data/class_weights{suffix}.pkl")
 
     # 2. Save JSON format for human readability
     weights_json = {
@@ -608,9 +610,9 @@ def save_artifacts(cw_encoded, cw_named, raw_cw_named,
         'binary': {str(k): v for k, v in bin_weights.items()},
         'smoothing_mode': smoothing
     }
-    with open('models/class_weights.json', 'w') as f:
+    with open(f'models/class_weights{suffix}.json', 'w') as f:
         json.dump(weights_json, f, indent=4)
-    print("  [Saved] models/class_weights.json")
+    print(f"  [Saved] models/class_weights{suffix}.json")
 
     # 3. Update preprocessor joblib
     preprocessor['class_weights_encoded'] = cw_encoded
@@ -623,15 +625,17 @@ def save_artifacts(cw_encoded, cw_named, raw_cw_named,
 
     # 4. Save balanced dataset if generated
     if X_balanced is not None and y_balanced_dict is not None:
-        joblib.dump(X_balanced, 'data/X_train_balanced.pkl', compress=3)
-        joblib.dump(y_balanced_dict, 'data/y_train_balanced.pkl', compress=3)
-        print("  [Saved] data/X_train_balanced.pkl & data/y_train_balanced.pkl")
+        x_bal_path = f'data/X_train_balanced{suffix}.pkl'
+        y_bal_path = f'data/y_train_balanced{suffix}.pkl'
+        joblib.dump(X_balanced, x_bal_path, compress=3)
+        joblib.dump(y_balanced_dict, y_bal_path, compress=3)
+        print(f"  [Saved] {x_bal_path} & {y_bal_path}")
 
     # 5. Save Resampling Summary JSON
     if resampling_summary:
-        with open('models/resampling_summary.json', 'w') as f:
+        with open(f'models/resampling_summary{suffix}.json', 'w') as f:
             json.dump(resampling_summary, f, indent=4)
-        print("  [Saved] models/resampling_summary.json")
+        print(f"  [Saved] models/resampling_summary{suffix}.json")
 
 
 def main():
@@ -661,6 +665,8 @@ def main():
                         help="Random seed for reproducibility")
     parser.add_argument('--skip-plots', action='store_true',
                         help="Skip generating visualization plots")
+    parser.add_argument('--batch-suffix', type=str, default=None,
+                        help="Suffix for output dataset files (e.g. '500k' -> X_train_balanced_500k.pkl)")
     args = parser.parse_args()
 
     # 🎯 Redirect working directory to Google Drive if in Colab or if custom output-dir is given
@@ -767,7 +773,8 @@ def main():
     save_artifacts(cw_enc, cw_named, raw_cw_named,
                    cat_enc, cat_named, raw_cat_named, bin_w,
                    preprocessor, X_bal, y_balanced_dict, resampling_summary,
-                   smoothing=args.weight_smoothing)
+                   smoothing=args.weight_smoothing,
+                   batch_suffix=args.batch_suffix)
 
     print("\n" + "=" * 80)
     print("PHASE 3 COMPLETED SUCCESSFULLY!")

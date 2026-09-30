@@ -1,0 +1,7 @@
+{
+    "champion_experiment_id": "exp_005_xgboost_tuned",
+    "method": "XGBoost / Gradient Boosting Tuned",
+    "f1_macro": 0.9457,
+    "accuracy": 0.9751,
+    "updated_at": "2026-09-28T14:17:10.133687"
+}

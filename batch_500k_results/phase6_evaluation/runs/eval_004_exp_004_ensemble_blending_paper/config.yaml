@@ -1,0 +1,44 @@
+evaluation:
+  id: eval_004_exp_004_ensemble_blending_paper
+  date: '2026-09-28'
+  timestamp: '2026-09-28T14:20:09.854593'
+  model_loading_time_sec: 0.9821
+model:
+  experiment_id: exp_004_ensemble_blending_paper
+  name: exp_004_ensemble_blending_paper
+  model_path: /content/drive/MyDrive/do_an/phase5_experiments_500k/exp_004_ensemble_blending_paper/model/model.pkl
+  hyperparameters: {}
+dataset:
+  name: CICIoT2023
+  classes: 8
+  class_names:
+  - BruteForce
+  - DDoS
+  - DoS
+  - Mirai
+  - Normal
+  - Recon
+  - Spoofing
+  - Web-Based
+  validation_samples: 65518
+  test_samples: 65519
+evaluation_sets:
+  validation: true
+  test: true
+metrics:
+- accuracy
+- precision_macro
+- recall_macro
+- f1_macro
+- f1_weighted
+- roc_auc_macro
+- confusion_matrix
+- inference_latency
+reproducibility:
+  phase5_training_seed: 123
+  holdout_split_seed: 123
+  val_test_split_seed: 123
+  stability_seeds:
+  - 42
+  - 123
+  - 2024

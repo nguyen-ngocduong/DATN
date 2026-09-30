@@ -1,0 +1,12 @@
+experiment_id: exp_004_ensemble_blending_paper
+model_name: Ensemble Blending Model
+model_class: VotingClassifier
+hyperparameters:
+  voting: soft
+  estimators:
+  - Decision Tree
+  - Random Forest
+  - Gradient Boosting
+  aggregation: avg_prob_i = sum_prob_i / 3 (Equation 17 in Paper)
+training_time_seconds: 289.8004
+timestamp: '2026-09-28T14:14:17.287077'

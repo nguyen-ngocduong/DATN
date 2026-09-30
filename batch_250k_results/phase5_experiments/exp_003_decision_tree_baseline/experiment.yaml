@@ -1,0 +1,16 @@
+experiment_id: exp_003_decision_tree_baseline
+experiment_name: Decision Tree Baseline
+method: Decision Tree
+phase: 5
+status: completed
+created_at: '2026-09-27T16:20:00'
+description: Single Decision Tree baseline for low-complexity baseline comparison
+  (IEEE Access paper)
+linked_evaluation_run: eval_003_exp_003_decision_tree_baseline
+config_path: exp_003_decision_tree_baseline/config/hyperparameters.yaml
+metrics_reference: metrics/metrics.json
+config_reference: config/hyperparameters.yaml
+primary_metric:
+  f1_macro: 0.7468
+  accuracy: 0.8116
+  roc_auc: 0.9661

@@ -1,0 +1,4 @@
+batch,accuracy,f1_macro,f1_weighted,roc_auc,precision_macro,recall_macro,latency_p50_ms,throughput_samples_sec,status
+250K,0.9693,0.937,0.9697,0.9986,0.9271,0.9492,10.51,9063.7,Completed
+500K,0.8693,0.8565,0.873,0.9914,0.8443,0.8827,23.28,325991.2,Completed
+1M,,,,,,,,,Pending

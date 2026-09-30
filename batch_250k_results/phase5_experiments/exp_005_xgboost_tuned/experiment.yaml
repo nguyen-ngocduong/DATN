@@ -1,0 +1,15 @@
+experiment_id: exp_005_xgboost_tuned
+experiment_name: XGBoost / Gradient Boosting Tuned
+method: XGBoost Tuned
+phase: 5
+status: best
+created_at: '2026-09-27T16:20:00'
+description: Hyperparameter-tuned boosting model with deeper depth=6 and 150 iterations
+linked_evaluation_run: eval_005_exp_005_xgboost_tuned
+config_path: exp_005_xgboost_tuned/config/hyperparameters.yaml
+metrics_reference: metrics/metrics.json
+config_reference: config/hyperparameters.yaml
+primary_metric:
+  f1_macro: 0.8406
+  accuracy: 0.8706
+  roc_auc: 0.9926

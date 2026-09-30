@@ -1,0 +1,41 @@
+Eval ID,Model Name,Class,Precision,Recall,F1-Score,Support
+eval_001_exp_001_rf_baseline,Random Forest Baseline,BruteForce,0.8148648648648649,0.8541076487252125,0.8340248962655602,706.0
+eval_001_exp_001_rf_baseline,Random Forest Baseline,DDoS,0.9994047619047619,0.9953561900997925,0.9973763675065591,10121.0
+eval_001_exp_001_rf_baseline,Random Forest Baseline,DoS,0.9990359897172236,0.9977535301668806,0.9983943481053308,3116.0
+eval_001_exp_001_rf_baseline,Random Forest Baseline,Mirai,0.9995805369127517,0.997071129707113,0.9983242563887725,2390.0
+eval_001_exp_001_rf_baseline,Random Forest Baseline,Normal,0.7230941704035875,0.9097320169252469,0.8057464084946908,709.0
+eval_001_exp_001_rf_baseline,Random Forest Baseline,Recon,0.9606164383561644,0.893312101910828,0.9257425742574258,3768.0
+eval_001_exp_001_rf_baseline,Random Forest Baseline,Spoofing,0.9334795321637427,0.8640054127198917,0.8973998594518623,1478.0
+eval_001_exp_001_rf_baseline,Random Forest Baseline,Web-Based,0.9096606872703695,0.9524779361846571,0.9305770506301128,4419.0
+eval_002_exp_002_xgboost_baseline,Gradient Boosting Baseline,BruteForce,0.5707410972088547,0.839943342776204,0.6796561604584527,706.0
+eval_002_exp_002_xgboost_baseline,Gradient Boosting Baseline,DDoS,1.0,0.9988143464084577,0.9994068215521503,10121.0
+eval_002_exp_002_xgboost_baseline,Gradient Boosting Baseline,DoS,0.9993583573949311,0.9996790757381258,0.9995186908390823,3116.0
+eval_002_exp_002_xgboost_baseline,Gradient Boosting Baseline,Mirai,1.0,1.0,1.0,2390.0
+eval_002_exp_002_xgboost_baseline,Gradient Boosting Baseline,Normal,0.6144814090019569,0.8857545839210155,0.7255921432697863,709.0
+eval_002_exp_002_xgboost_baseline,Gradient Boosting Baseline,Recon,0.9257681776696075,0.8075902335456475,0.8626506024096385,3768.0
+eval_002_exp_002_xgboost_baseline,Gradient Boosting Baseline,Spoofing,0.8401122019635343,0.8105548037889039,0.8250688705234159,1478.0
+eval_002_exp_002_xgboost_baseline,Gradient Boosting Baseline,Web-Based,0.8895066018068103,0.8689748811948405,0.8791208791208791,4419.0
+eval_003_exp_003_decision_tree_baseline,Decision Tree Baseline,BruteForce,0.5917753259779338,0.8356940509915014,0.6928948913681738,706.0
+eval_003_exp_003_decision_tree_baseline,Decision Tree Baseline,DDoS,0.9989093793376959,0.9954549945657544,0.9971791953283515,10121.0
+eval_003_exp_003_decision_tree_baseline,Decision Tree Baseline,DoS,1.0,0.9987163029525032,0.9993577392421323,3116.0
+eval_003_exp_003_decision_tree_baseline,Decision Tree Baseline,Mirai,0.9995814148179154,0.999163179916318,0.9993722536095417,2390.0
+eval_003_exp_003_decision_tree_baseline,Decision Tree Baseline,Normal,0.6267326732673267,0.8928067700987306,0.7364746945898778,709.0
+eval_003_exp_003_decision_tree_baseline,Decision Tree Baseline,Recon,0.9396578538102643,0.8017515923566879,0.8652441643992553,3768.0
+eval_003_exp_003_decision_tree_baseline,Decision Tree Baseline,Spoofing,0.8974739970282318,0.8173207036535859,0.8555240793201133,1478.0
+eval_003_exp_003_decision_tree_baseline,Decision Tree Baseline,Web-Based,0.866871704745167,0.8929622086444897,0.8797235536729462,4419.0
+eval_004_exp_004_ensemble_blending_paper,Ensemble Blending (RF + GB),BruteForce,0.6790960451977401,0.8512747875354107,0.7554996857322439,706.0
+eval_004_exp_004_ensemble_blending_paper,Ensemble Blending (RF + GB),DDoS,1.0,0.9992095642723051,0.9996046258772363,10121.0
+eval_004_exp_004_ensemble_blending_paper,Ensemble Blending (RF + GB),DoS,0.9993583573949311,0.9996790757381258,0.9995186908390823,3116.0
+eval_004_exp_004_ensemble_blending_paper,Ensemble Blending (RF + GB),Mirai,1.0,1.0,1.0,2390.0
+eval_004_exp_004_ensemble_blending_paper,Ensemble Blending (RF + GB),Normal,0.6914103923647932,0.919605077574048,0.7893462469733656,709.0
+eval_004_exp_004_ensemble_blending_paper,Ensemble Blending (RF + GB),Recon,0.9526888039964737,0.8604033970276008,0.9041974619997211,3768.0
+eval_004_exp_004_ensemble_blending_paper,Ensemble Blending (RF + GB),Spoofing,0.9175108538350217,0.857916102841678,0.8867132867132868,1478.0
+eval_004_exp_004_ensemble_blending_paper,Ensemble Blending (RF + GB),Web-Based,0.910818059901654,0.9221543335596288,0.9164511413471269,4419.0
+eval_005_exp_005_xgboost_tuned,XGBoost / Gradient Boosting Tuned,BruteForce,0.7747524752475248,0.886685552407932,0.8269484808454426,706.0
+eval_005_exp_005_xgboost_tuned,XGBoost / Gradient Boosting Tuned,DDoS,0.9999011857707509,0.9998023910680762,0.9998517859789536,10121.0
+eval_005_exp_005_xgboost_tuned,XGBoost / Gradient Boosting Tuned,DoS,1.0,0.9993581514762516,0.9996789727126806,3116.0
+eval_005_exp_005_xgboost_tuned,XGBoost / Gradient Boosting Tuned,Mirai,1.0,1.0,1.0,2390.0
+eval_005_exp_005_xgboost_tuned,XGBoost / Gradient Boosting Tuned,Normal,0.7980416156670747,0.919605077574048,0.854521625163827,709.0
+eval_005_exp_005_xgboost_tuned,XGBoost / Gradient Boosting Tuned,Recon,0.9641766176062205,0.921443736730361,0.9423259601031347,3768.0
+eval_005_exp_005_xgboost_tuned,XGBoost / Gradient Boosting Tuned,Spoofing,0.9236016371077762,0.9161028416779432,0.9198369565217391,1478.0
+eval_005_exp_005_xgboost_tuned,XGBoost / Gradient Boosting Tuned,Web-Based,0.9457982236392621,0.939805385833899,0.9427922814982974,4419.0

@@ -62,7 +62,7 @@ plt.style.use('seaborn-v0_8-whitegrid')
 # ------------------------------------------------------------------------------
 # 1. Data Loading Helper
 # ------------------------------------------------------------------------------
-def load_phase_data(data_dir=None, use_balanced=True):
+def load_phase_data(data_dir=None, use_balanced=True, batch_suffix=None):
     """
     Load training data from Phase 3 balanced set (or Phase 2 preprocessed set).
     """
@@ -70,20 +70,38 @@ def load_phase_data(data_dir=None, use_balanced=True):
     print("LOADING TRAINING DATA")
     print("=" * 70)
 
+    suffix = f"_{batch_suffix}" if batch_suffix else ""
+
     # Search paths for X_train
     if use_balanced:
-        x_candidates = ['data/X_train_balanced.pkl', 'X_train_balanced.pkl', 'data/X_train.pkl', 'X_train.pkl']
-        y_candidates = ['data/y_train_balanced.pkl', 'y_train_balanced.pkl', 'data/y_train.pkl', 'y_train.pkl']
+        x_candidates = [
+            f'data/X_train_balanced{suffix}.pkl', f'X_train_balanced{suffix}.pkl',
+            'data/X_train_balanced.pkl', 'X_train_balanced.pkl',
+            'data/X_train.pkl', 'X_train.pkl'
+        ]
+        y_candidates = [
+            f'data/y_train_balanced{suffix}.pkl', f'y_train_balanced{suffix}.pkl',
+            'data/y_train_balanced.pkl', 'y_train_balanced.pkl',
+            'data/y_train.pkl', 'y_train.pkl'
+        ]
     else:
         x_candidates = ['data/X_train.pkl', 'X_train.pkl', 'data/X_train_balanced.pkl', 'X_train_balanced.pkl']
         y_candidates = ['data/y_train.pkl', 'y_train.pkl', 'data/y_train_balanced.pkl', 'y_train_balanced.pkl']
 
     if data_dir:
-        x_candidates = [os.path.join(data_dir, 'X_train_balanced.pkl'), os.path.join(data_dir, 'X_train.pkl')] + x_candidates
-        y_candidates = [os.path.join(data_dir, 'y_train_balanced.pkl'), os.path.join(data_dir, 'y_train.pkl')] + y_candidates
+        x_candidates = [
+            os.path.join(data_dir, f'X_train_balanced{suffix}.pkl'),
+            os.path.join(data_dir, 'X_train_balanced.pkl'),
+            os.path.join(data_dir, 'X_train.pkl')
+        ] + x_candidates
+        y_candidates = [
+            os.path.join(data_dir, f'y_train_balanced{suffix}.pkl'),
+            os.path.join(data_dir, 'y_train_balanced.pkl'),
+            os.path.join(data_dir, 'y_train.pkl')
+        ] + y_candidates
 
-    x_path = next((p for p in x_candidates if os.path.exists(p)), None)
-    y_path = next((p for p in y_candidates if os.path.exists(p)), None)
+    x_path = next((p for p in x_candidates if p and os.path.exists(p)), None)
+    y_path = next((p for p in y_candidates if p and os.path.exists(p)), None)
 
     if not x_path or not y_path:
         raise FileNotFoundError(
@@ -586,7 +604,7 @@ def create_visualizations(var_df, var_threshold, corr_matrix, collinear_features
 def save_feature_selection_artifacts(X_selected, selected_features, dropped_features,
                                      dropped_var_features, dropped_corr_features,
                                      importance_df, pca_model=None, pca_summary=None,
-                                     output_dir='data', models_dir='models'):
+                                     output_dir='data', models_dir='models', batch_suffix=None):
     """
     Serialize all deliverables for Phase 4.
     """
@@ -596,17 +614,20 @@ def save_feature_selection_artifacts(X_selected, selected_features, dropped_feat
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(models_dir, exist_ok=True)
 
+    suffix = f"_{batch_suffix}" if batch_suffix else ""
+
     # 1. Save reduced dataset
-    p_pkl = os.path.join(output_dir, 'X_train_selected.pkl')
+    p_pkl = os.path.join(output_dir, f'X_train_selected{suffix}.pkl')
     print(f"Saving selected feature matrix to: {p_pkl}")
     joblib.dump(X_selected, p_pkl, compress=3)
 
     # Also save to root if needed for direct loading
-    joblib.dump(X_selected, 'X_train_reduced.pkl', compress=3)
-    print("Saved mirror: X_train_reduced.pkl")
+    if not batch_suffix:
+        joblib.dump(X_selected, 'X_train_reduced.pkl', compress=3)
+        print("Saved mirror: X_train_reduced.pkl")
 
     try:
-        p_parquet = os.path.join(output_dir, 'X_train_selected.parquet')
+        p_parquet = os.path.join(output_dir, f'X_train_selected{suffix}.parquet')
         X_selected.to_parquet(p_parquet, index=False)
         print(f"Exported Parquet: {p_parquet}")
     except Exception as e:
@@ -629,7 +650,7 @@ def save_feature_selection_artifacts(X_selected, selected_features, dropped_feat
             'components_for_95_pct': pca_summary['components_for_95_pct']
         }
 
-    p_json = os.path.join(models_dir, 'selected_features.json')
+    p_json = os.path.join(models_dir, f'selected_features{suffix}.json')
     with open(p_json, 'w', encoding='utf-8') as f:
         json.dump(meta_json, f, indent=4)
     print(f"Saved metadata: {p_json}")
@@ -699,6 +720,8 @@ def main():
                         help='Do not use balanced dataset, force using raw Phase 2 train set')
     parser.add_argument('--skip-plots', action='store_true', default=False,
                         help='Skip saving visualization plots')
+    parser.add_argument('--batch-suffix', type=str, default=None,
+                        help="Suffix for dataset files (e.g. '500k' -> loads X_train_balanced_500k.pkl, saves X_train_selected_500k.pkl)")
     args = parser.parse_args()
 
     # 🎯 Redirect working directory to Google Drive if in Colab or if custom output-dir is given
@@ -714,7 +737,7 @@ def main():
         os.makedirs('plots', exist_ok=True)
 
     # 1. Load Data
-    X_train, y_dict, preprocessor = load_phase_data(data_dir=args.data_dir, use_balanced=args.use_balanced)
+    X_train, y_dict, preprocessor = load_phase_data(data_dir=args.data_dir, use_balanced=args.use_balanced, batch_suffix=args.batch_suffix)
 
     # Resolve target
     y_target, tier_name, n_classes = resolve_target(y_dict, requested_tier=args.target_tier)
@@ -769,7 +792,8 @@ def main():
         pca_model=pca_model,
         pca_summary=pca_summary,
         output_dir='data',
-        models_dir=args.models_dir
+        models_dir=args.models_dir,
+        batch_suffix=args.batch_suffix
     )
 
     print("\n" + "=" * 70)

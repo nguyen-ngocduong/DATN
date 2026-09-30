@@ -1,0 +1,13 @@
+{
+    "experiment_id": "exp_005_xgboost_tuned",
+    "method": "XGBoost / Gradient Boosting Tuned",
+    "accuracy": 0.9698,
+    "roc_auc_ovr_macro": 0.9986,
+    "precision_macro": 0.9286,
+    "recall_macro": 0.9494,
+    "f1_macro": 0.938,
+    "f1_weighted": 0.9701,
+    "training_time_sec": 63.76,
+    "testing_time_sec": 7.346,
+    "test_samples": 53413
+}

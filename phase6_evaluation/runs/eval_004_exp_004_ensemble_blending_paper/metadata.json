@@ -1,0 +1,26 @@
+{
+    "eval_id": "eval_004_exp_004_ensemble_blending_paper",
+    "phase5_experiment_id": "exp_004_ensemble_blending_paper",
+    "model_type": "VotingClassifier",
+    "reproducibility": {
+        "phase5_training_seed": 123,
+        "holdout_split_seed": 123,
+        "val_test_split_seed": 123
+    },
+    "n_features": 25,
+    "val_metrics": {
+        "accuracy": 0.9534,
+        "f1_macro": 0.9079,
+        "roc_auc_macro": 0.9971
+    },
+    "test_metrics": {
+        "accuracy": 0.9532,
+        "f1_macro": 0.9064,
+        "roc_auc_macro": 0.9967
+    },
+    "latency_metrics": {
+        "median_ms": 41.73980049995407,
+        "throughput_sps": 23.957948720936038
+    },
+    "threshold_optimization_ref": "threshold_optimization.json"
+}

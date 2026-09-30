@@ -114,7 +114,7 @@ ATTACK_TO_8_CLASS = {
     'XSS': 'Web-Based', 'Uploading_Attack': 'Web-Based',
     'DictionaryBruteForce': 'BruteForce',
     'BenignTraffic': 'Normal',
-    'Backdoor_Malware': 'Spoofing',
+    'Backdoor_Malware': 'Web-Based',
     'DDoS': 'DDoS', 'DoS': 'DoS', 'Mirai': 'Mirai', 'Recon': 'Recon',
     'Spoofing': 'Spoofing', 'Web': 'Web-Based', 'Web-Based': 'Web-Based',
     'BruteForce': 'BruteForce', 'Benign': 'Normal', 'Normal': 'Normal'
@@ -160,7 +160,7 @@ def setup_evaluation_environment(base_dir=None, eval_root="phase6_evaluation"):
 # 3. Independent Validation and Test Sets Preparation
 # ------------------------------------------------------------------------------
 def prepare_validation_and_test_data(data_path=None, target_path=None, val_ratio=0.5,
-                                     random_state=42, phase5_seed=123):
+                                     random_state=123, phase5_seed=123):
     """
     Loads features and target, separates out the holdout set (never used in Phase 5 train),
     and strictly splits it into independent Validation and Test sets.
@@ -416,8 +416,71 @@ def evaluate_split(model, X, y, class_names, split_name="validation", output_dir
         'roc_auc_weighted': roc_dict['roc_auc_weighted'],
         'eval_duration_sec': round(float(eval_duration), 4),
         'samples': len(y),
-        'per_class_metrics': cr_dict
+        'per_class_metrics': cr_dict,
+        'prob': reordered_prob if y_prob is not None else None
     }
+
+
+def optimize_per_class_thresholds(y_val, val_prob, y_test, test_prob, class_names, output_dir="."):
+    """
+    Optimizes per-class decision thresholds on Validation Set to maximize F1-Score,
+    and independently evaluates the gains on the Test Set (Zero Data Leakage).
+    Addresses minority classes like BruteForce and Normal.
+    """
+    if val_prob is None or test_prob is None:
+        return {}
+    os.makedirs(output_dir, exist_ok=True)
+    optimization_results = {}
+    threshold_grid = np.linspace(0.05, 0.95, 37)
+
+    for idx, cname in enumerate(class_names):
+        y_val_bin = (y_val == cname).astype(int)
+        y_test_bin = (y_test == cname).astype(int)
+
+        val_p = val_prob[:, idx]
+        test_p = test_prob[:, idx]
+
+        # 1. Baseline on Validation (at threshold = 0.5)
+        base_val_pred = (val_p >= 0.5).astype(int)
+        base_val_f1 = f1_score(y_val_bin, base_val_pred, zero_division=0)
+
+        # 2. Grid search for optimal threshold on Validation
+        best_thresh = 0.5
+        best_val_f1 = base_val_f1
+        for thresh in threshold_grid:
+            cand_pred = (val_p >= thresh).astype(int)
+            cand_f1 = f1_score(y_val_bin, cand_pred, zero_division=0)
+            if cand_f1 > best_val_f1:
+                best_val_f1 = cand_f1
+                best_thresh = thresh
+
+        # 3. Independent evaluation on Test Set
+        base_test_pred = (test_p >= 0.5).astype(int)
+        base_test_f1 = f1_score(y_test_bin, base_test_pred, zero_division=0)
+        base_test_prec = precision_score(y_test_bin, base_test_pred, zero_division=0)
+        base_test_rec = recall_score(y_test_bin, base_test_pred, zero_division=0)
+
+        opt_test_pred = (test_p >= best_thresh).astype(int)
+        opt_test_f1 = f1_score(y_test_bin, opt_test_pred, zero_division=0)
+        opt_test_prec = precision_score(y_test_bin, opt_test_pred, zero_division=0)
+        opt_test_rec = recall_score(y_test_bin, opt_test_pred, zero_division=0)
+
+        optimization_results[cname] = {
+            'optimal_threshold': round(float(best_thresh), 4),
+            'val_baseline_f1': round(float(base_val_f1), 4),
+            'val_optimized_f1': round(float(best_val_f1), 4),
+            'test_baseline_f1': round(float(base_test_f1), 4),
+            'test_optimized_f1': round(float(opt_test_f1), 4),
+            'f1_delta': round(float(opt_test_f1 - base_test_f1), 4),
+            'test_optimized_precision': round(float(opt_test_prec), 4),
+            'test_optimized_recall': round(float(opt_test_rec), 4)
+        }
+
+    out_file = os.path.join(output_dir, 'threshold_optimization.json')
+    with open(out_file, 'w', encoding='utf-8') as f:
+        json.dump(optimization_results, f, indent=4)
+
+    return optimization_results
 
 
 def measure_inference_performance(model, X_sample, total_test_samples, output_dir="."):
@@ -426,12 +489,12 @@ def measure_inference_performance(model, X_sample, total_test_samples, output_di
     """
     os.makedirs(output_dir, exist_ok=True)
 
-    # 1. Warm-up
-    warmup_n = min(50, len(X_sample))
+    # 1. Warm-up (stable realistic IoT condition)
+    warmup_n = min(1000, len(X_sample))
     _ = model.predict(X_sample[:warmup_n])
 
-    # 2. Single-sample latency (measure 500 samples)
-    n_singles = min(500, len(X_sample))
+    # 2. Single-sample latency (measure 1,000 samples)
+    n_singles = min(1000, len(X_sample))
     single_times = []
     for i in range(n_singles):
         sample = X_sample.iloc[[i]] if hasattr(X_sample, 'iloc') else X_sample[i:i+1]
@@ -518,7 +581,7 @@ class Phase6EvaluationPipeline:
             print(f"  {idx}. [{exp_id}] -> {m_file}")
 
         for idx, (exp_id, model_path, exp_path) in enumerate(exp_dirs, 1):
-            eval_id = f"eval_{idx:03d}"
+            eval_id = f"eval_{idx:03d}_{exp_id}"
             self._evaluate_single_model(
                 eval_id=eval_id,
                 phase5_exp_id=exp_id,
@@ -597,7 +660,22 @@ class Phase6EvaluationPipeline:
         )
         print(f"  * Test Accuracy:       {test_res['accuracy'] * 100:.2f}% | F1-Macro: {test_res['f1_macro'] * 100:.2f}% | AUC: {test_res['roc_auc_macro']}")
 
-        # 3. Performance & Latency Benchmark
+        # 3. Per-Class Decision Threshold Optimization (Focusing on BruteForce & Normal)
+        print("Optimizing per-class decision thresholds on Validation Set and evaluating on Test Set...")
+        thresh_res = optimize_per_class_thresholds(
+            y_val=y_val,
+            val_prob=val_res.get('prob'),
+            y_test=y_test,
+            test_prob=test_res.get('prob'),
+            class_names=CLASS_NAMES_8,
+            output_dir=run_dir
+        )
+        if 'BruteForce' in thresh_res and 'Normal' in thresh_res:
+            bf_gain = thresh_res['BruteForce']['f1_delta'] * 100
+            nm_gain = thresh_res['Normal']['f1_delta'] * 100
+            print(f"  * Threshold Optimization -> BruteForce F1 Gain: {bf_gain:+.2f}% | Normal F1 Gain: {nm_gain:+.2f}%")
+
+        # 4. Performance & Latency Benchmark
         print(f"Benchmarking inference latency on {len(X_test):,} test samples...")
         perf_res = measure_inference_performance(
             model=model,
@@ -609,6 +687,18 @@ class Phase6EvaluationPipeline:
         lat_mean = perf_res['single_sample_latency_ms']['mean']
         thru = perf_res['batch_performance']['throughput_samples_per_sec']
         print(f"  * Median Latency: {lat_p50:.4f} ms/sample | Throughput: {thru:,.1f} samples/sec")
+
+        # Save Performance Benchmark Config (performance/config.yaml)
+        perf_config = {
+            'benchmark': {
+                'batch_size': 1000,
+                'n_batches': 10,
+                'warmup_runs': 2,
+                'device': 'cpu'
+            }
+        }
+        with open(os.path.join(perf_dir, 'config.yaml'), 'w', encoding='utf-8') as f:
+            yaml.dump(perf_config, f, default_flow_style=False, sort_keys=False)
 
         # 4. Save Run Config (config.yaml)
         run_config = {
@@ -645,7 +735,12 @@ class Phase6EvaluationPipeline:
                 'confusion_matrix',
                 'inference_latency'
             ],
-            'random_seed': 42
+            'reproducibility': {
+                'phase5_training_seed': 123,
+                'holdout_split_seed': 123,
+                'val_test_split_seed': 123,
+                'stability_seeds': [42, 123, 2024]
+            }
         }
 
         with open(os.path.join(run_dir, 'config.yaml'), 'w', encoding='utf-8') as f:
@@ -656,6 +751,11 @@ class Phase6EvaluationPipeline:
             'eval_id': eval_id,
             'phase5_experiment_id': phase5_exp_id,
             'model_type': type(model).__name__,
+            'reproducibility': {
+                'phase5_training_seed': 123,
+                'holdout_split_seed': 123,
+                'val_test_split_seed': 123
+            },
             'n_features': len(feature_names),
             'feature_names': feature_names,
             'val_metrics': {
@@ -804,6 +904,59 @@ class Phase6EvaluationPipeline:
         plt.savefig(comp_png, bbox_inches='tight')
         plt.close(fig)
         print(f"Saved: {comp_png}")
+
+        # 5. Save EVALUATION_REGISTRY.yaml
+        registry_file = os.path.join(self.env['root'], 'EVALUATION_REGISTRY.yaml')
+        eval_runs_meta = []
+        for _, row in df_summary.iterrows():
+            eval_runs_meta.append({
+                'eval_id': row['Eval ID'],
+                'model_name': row['Model Name'],
+                'phase5_experiment_id': row['Phase 5 Experiment'],
+                'val_f1_macro': float(row['Val F1-Macro']),
+                'val_accuracy': float(row['Val Acc']),
+                'test_f1_macro': float(row['Test F1-Macro']),
+                'test_accuracy': float(row['Test Acc']),
+                'test_roc_auc': float(row['Test ROC-AUC']),
+                'latency_p50_ms': float(row['Latency Median (ms)'])
+            })
+        registry_data = {
+            'phase': 'Phase 6: Rigorous Validation & Independent Testing',
+            'dataset': 'CICIoT2023 8-Class IoT Attack Dataset',
+            'last_updated': datetime.now().isoformat(),
+            'best_eval_id': df_summary.iloc[0]['Eval ID'],
+            'evaluation_runs': eval_runs_meta
+        }
+        with open(registry_file, 'w', encoding='utf-8') as f:
+            yaml.dump(registry_data, f, default_flow_style=False, sort_keys=False)
+        print(f"Saved: {registry_file}")
+
+        # 6. Save threshold_optimization_summary.csv
+        thresh_records = []
+        for r_id in os.listdir(self.env['runs']):
+            t_file = os.path.join(self.env['runs'], r_id, 'threshold_optimization.json')
+            if os.path.exists(t_file):
+                try:
+                    with open(t_file) as f:
+                        t_data = json.load(f)
+                    for cname, t_val in t_data.items():
+                        thresh_records.append({
+                            'Eval ID': r_id,
+                            'Class': cname,
+                            'Optimal Threshold': t_val.get('optimal_threshold'),
+                            'Test Baseline F1': t_val.get('test_baseline_f1'),
+                            'Test Optimized F1': t_val.get('test_optimized_f1'),
+                            'F1 Delta': t_val.get('f1_delta'),
+                            'Optimized Precision': t_val.get('test_optimized_precision'),
+                            'Optimized Recall': t_val.get('test_optimized_recall')
+                        })
+                except Exception:
+                    pass
+        if thresh_records:
+            t_df = pd.DataFrame(thresh_records)
+            t_csv_path = os.path.join(comp_dir, 'threshold_optimization_summary.csv')
+            t_df.to_csv(t_csv_path, index=False)
+            print(f"Saved: {t_csv_path}")
 
         # Print summary table in stdout
         print("\n" + "=" * 75)

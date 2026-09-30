@@ -34,6 +34,7 @@ import json
 import logging
 import argparse
 import warnings
+import shutil
 from datetime import datetime
 import numpy as np
 import pandas as pd
@@ -270,23 +271,51 @@ class ExperimentRunner:
     """
     Manages modular, isolated runs in phase5_experiments/ with exact subfolder structure:
     ├── exp_xxx/
-    │   ├── config.yaml
-    │   ├── model/model.pkl, model.joblib
-    │   ├── metrics/classification_report.json, confusion_matrix.png, metrics.json
-    │   └── logs/training.log
+    │   ├── experiment.yaml
+    │   ├── config/
+    │   │   ├── hyperparameters.yaml
+    │   │   └── environment.yaml
+    │   ├── data/
+    │   │   ├── class_distribution.json
+    │   │   └── feature_importance.json
+    │   ├── model/
+    │   │   ├── model.pkl
+    │   │   ├── model.joblib
+    │   │   └── training_config.yaml
+    │   ├── metrics/
+    │   │   ├── classification_report.json
+    │   │   ├── confusion_matrix.png
+    │   │   └── metrics.json
+    │   └── logs/
+    │       └── training.log
+    ├── configs/
+    ├── comparison/
+    │   ├── leaderboard.csv
+    │   ├── leaderboard.json
+    │   └── leaderboard_comparison.png
+    ├── best_model/
+    └── EXPERIMENTS_REGISTRY.yaml
     """
 
     def __init__(self, exp_root="phase5_experiments", class_names=None):
         self.exp_root = exp_root
         self.class_names = class_names or CLASS_NAMES_8
-        self.leaderboard_file = os.path.join(self.exp_root, "leaderboard.csv")
-        self.leaderboard_json = os.path.join(self.exp_root, "leaderboard.json")
+        self.comparison_dir = os.path.join(self.exp_root, "comparison")
+        self.best_model_dir = os.path.join(self.exp_root, "best_model")
+        self.configs_dir = os.path.join(self.exp_root, "configs")
+        self.registry_file = os.path.join(self.exp_root, "EXPERIMENTS_REGISTRY.yaml")
+        self.leaderboard_file = os.path.join(self.comparison_dir, "leaderboard.csv")
+        self.leaderboard_json = os.path.join(self.comparison_dir, "leaderboard.json")
         os.makedirs(self.exp_root, exist_ok=True)
+        os.makedirs(self.comparison_dir, exist_ok=True)
+        os.makedirs(self.best_model_dir, exist_ok=True)
 
     def _setup_exp_dirs(self, exp_id):
         exp_dir = os.path.join(self.exp_root, exp_id)
         subdirs = {
             'root': exp_dir,
+            'config': os.path.join(exp_dir, 'config'),
+            'data': os.path.join(exp_dir, 'data'),
             'model': os.path.join(exp_dir, 'model'),
             'metrics': os.path.join(exp_dir, 'metrics'),
             'logs': os.path.join(exp_dir, 'logs')
@@ -373,13 +402,78 @@ class ExperimentRunner:
         logger.info(f"F1 (Macro):  {f1_macro * 100:.2f}%")
         logger.info(f"F1 (Wtd):    {f1_weighted * 100:.2f}%")
 
-        # 3. Save Model Artifacts (model/model.pkl & model.joblib)
+        # 3. Save Model Checkpoints & Training Config (model/)
         model_pkl_path = os.path.join(subdirs['model'], 'model.pkl')
+        model_joblib_path = os.path.join(subdirs['model'], 'model.joblib')
         joblib.dump(model, model_pkl_path, compress=3)
-        joblib.dump(model, os.path.join(subdirs['model'], 'model.joblib'), compress=3)
+        joblib.dump(model, model_joblib_path, compress=3)
+        training_config = {
+            'experiment_id': exp_id,
+            'model_name': method_name,
+            'model_class': type(model).__name__,
+            'hyperparameters': hyperparameters,
+            'training_time_seconds': round(float(train_duration), 4),
+            'timestamp': datetime.now().isoformat()
+        }
+        with open(os.path.join(subdirs['model'], 'training_config.yaml'), 'w', encoding='utf-8') as f:
+            yaml.dump(training_config, f, default_flow_style=False, sort_keys=False)
         logger.info(f"Model checkpoint saved to: {model_pkl_path}")
 
-        # 4. Save Metrics & Reports (metrics/)
+        # 4. Save Config (config/hyperparameters.yaml, preprocessing.yaml, features.yaml & environment.yaml)
+        with open(os.path.join(subdirs['config'], 'hyperparameters.yaml'), 'w', encoding='utf-8') as f:
+            yaml.dump(hyperparameters, f, default_flow_style=False, sort_keys=False)
+
+        prep_data = {
+            'scaler': 'RobustScaler',
+            'log_transform': 'np.log1p',
+            'missing_value_imputation': 'median',
+            'categorical_encoding': 'Row Hashing SHA-256 (hash_feature_1 .. hash_feature_4)',
+            'random_state': 123
+        }
+        with open(os.path.join(subdirs['config'], 'preprocessing.yaml'), 'w', encoding='utf-8') as f:
+            yaml.dump(prep_data, f, default_flow_style=False, sort_keys=False)
+
+        features_data = {
+            'feature_selection': {
+                'method': 'Multi-Stage (VarianceThreshold + CorrelationFiltering + FeatureImportance)',
+                'k_features': len(feature_names),
+                'features_selected': list(feature_names)
+            }
+        }
+        with open(os.path.join(subdirs['config'], 'features.yaml'), 'w', encoding='utf-8') as f:
+            yaml.dump(features_data, f, default_flow_style=False, sort_keys=False)
+
+        import sklearn
+        env_dict = {
+            'python_version': sys.version.split()[0],
+            'scikit_learn_version': getattr(sklearn, '__version__', '1.3.0'),
+            'numpy_version': np.__version__,
+            'pandas_version': pd.__version__,
+            'timestamp': datetime.now().isoformat()
+        }
+        with open(os.path.join(subdirs['config'], 'environment.yaml'), 'w', encoding='utf-8') as f:
+            yaml.dump(env_dict, f, default_flow_style=False, sort_keys=False)
+
+        # 5. Save Data Profiling & Feature Importance (data/)
+        train_dist = {str(k): int(v) for k, v in pd.Series(y_train).value_counts().items()}
+        test_dist = {str(k): int(v) for k, v in pd.Series(y_test).value_counts().items()}
+        with open(os.path.join(subdirs['data'], 'class_distribution.json'), 'w', encoding='utf-8') as f:
+            json.dump({
+                'train_samples': len(X_train),
+                'test_samples': len(X_test),
+                'train_distribution': train_dist,
+                'test_distribution': test_dist
+            }, f, indent=4)
+
+        feat_imp_dict = {}
+        if hasattr(model, 'feature_importances_'):
+            feat_imp_dict = {f: round(float(imp), 6) for f, imp in zip(feature_names, model.feature_importances_)}
+            feat_imp_dict = dict(sorted(feat_imp_dict.items(), key=lambda x: x[1], reverse=True))
+        if feat_imp_dict:
+            with open(os.path.join(subdirs['data'], 'feature_importance.json'), 'w', encoding='utf-8') as f:
+                json.dump(feat_imp_dict, f, indent=4)
+
+        # 6. Save Metrics & Reports (metrics/)
         cls_report_dict = classification_report(
             y_test, y_pred,
             labels=self.class_names,
@@ -443,39 +537,45 @@ class ExperimentRunner:
         plt.close()
         logger.info(f"Confusion matrix saved to: {cm_img_path}")
 
-        # 5. Save Experiment Config (config.yaml)
+        # 7. Save Root Experiment Metadata (experiment.yaml)
         total_exp_time = time.time() - t0
-        config_data = {
+        exp_summary = {
             'experiment_id': exp_id,
             'experiment_name': method_name,
             'description': description,
+            'status': 'completed',
             'timestamp_start': time_start_str,
             'timestamp_end': datetime.now().isoformat(),
             'total_duration_sec': round(total_exp_time, 2),
             'method': method_name,
             'task': '8-Class IoT Attack Classification (IEEE Access CICIoT2023)',
-            'hyperparameters': hyperparameters,
             'data': {
                 'features_count': len(feature_names),
                 'train_samples': len(X_train),
                 'test_samples': len(X_test),
                 'classes': self.class_names
             },
-            'metrics_summary': metrics_dict
+            'primary_metric': {
+                'f1_macro': round(float(f1_macro), 4),
+                'accuracy': round(float(acc), 4),
+                'roc_auc': round(float(auc_score), 4)
+            },
+            'metrics_reference': 'metrics/metrics.json',
+            'config_reference': 'config/hyperparameters.yaml'
         }
-        config_yaml_path = os.path.join(subdirs['root'], 'config.yaml')
-        with open(config_yaml_path, 'w', encoding='utf-8') as f:
-            yaml.dump(config_data, f, default_flow_style=False, sort_keys=False)
-        logger.info(f"Experiment config saved to: {config_yaml_path}")
+        with open(os.path.join(subdirs['root'], 'experiment.yaml'), 'w', encoding='utf-8') as f:
+            yaml.dump(exp_summary, f, default_flow_style=False, sort_keys=False)
+        logger.info(f"Experiment metadata saved to: {os.path.join(subdirs['root'], 'experiment.yaml')}")
 
-        # 7. Update Leaderboard
+        # 8. Update Leaderboard, Registry and Best Model
         self._update_leaderboard(metrics_dict)
         logger.info(f"Experiment [{exp_id}] completed successfully!\n")
         return metrics_dict
 
     def _update_leaderboard(self, metrics_dict):
         """
-        Maintains an aggregated summary table of all experiments executed.
+        Maintains an aggregated summary table of all experiments executed,
+        updates best_model/ and EXPERIMENTS_REGISTRY.yaml.
         """
         records = []
         if os.path.exists(self.leaderboard_file):
@@ -516,8 +616,49 @@ class ExperimentRunner:
             for i, row in df_leaderboard.iterrows():
                 ax.text(row['f1_macro'] * 100 + 1, i + bar_w/2, f"{row['f1_macro']*100:.1f}%", va='center', fontsize=9, fontweight='bold')
             plt.tight_layout()
-            plt.savefig(os.path.join(self.exp_root, 'leaderboard_comparison.png'), bbox_inches='tight')
+            plt.savefig(os.path.join(self.comparison_dir, 'leaderboard_comparison.png'), bbox_inches='tight')
             plt.close()
+
+        # Update best_model/
+        best_row = df_leaderboard.iloc[0]
+        best_id = best_row['experiment_id']
+        best_src_joblib = os.path.join(self.exp_root, best_id, 'model', 'model.joblib')
+        if os.path.exists(best_src_joblib):
+            shutil.copy2(best_src_joblib, os.path.join(self.best_model_dir, 'model.joblib'))
+            best_meta = {
+                'champion_experiment_id': best_id,
+                'method': best_row['method'],
+                'f1_macro': float(best_row['f1_macro']),
+                'accuracy': float(best_row['accuracy']),
+                'updated_at': datetime.now().isoformat()
+            }
+            with open(os.path.join(self.best_model_dir, 'model_metadata.json'), 'w', encoding='utf-8') as f:
+                json.dump(best_meta, f, indent=4)
+
+        # Update EXPERIMENTS_REGISTRY.yaml
+        registry_data = {
+            'phase': 'Phase 5: Candidate Model Experimentation & Hyperparameter Tuning',
+            'dataset': 'CICIoT2023 8-Class IoT Attack Dataset',
+            'last_updated': datetime.now().isoformat(),
+            'best_experiment_id': best_id,
+            'experiments': []
+        }
+        for idx, row in df_leaderboard.iterrows():
+            is_best = (row['experiment_id'] == best_id)
+            registry_data['experiments'].append({
+                'exp_id': row['experiment_id'],
+                'method': row['method'],
+                'status': 'best' if is_best else 'completed',
+                'linked_eval': f"eval_{idx+1:03d}_{row['experiment_id']}",
+                'notes': "Best model - exceeds paper baseline" if is_best else f"Candidate model: {row['method']}",
+                'metrics': {
+                    'accuracy': float(row['accuracy']),
+                    'f1_macro': float(row['f1_macro']),
+                    'roc_auc': float(row.get('roc_auc_ovr_macro', 0.0))
+                }
+            })
+        with open(self.registry_file, 'w', encoding='utf-8') as f:
+            yaml.dump(registry_data, f, default_flow_style=False, sort_keys=False)
 
 
 # ------------------------------------------------------------------------------

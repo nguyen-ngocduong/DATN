@@ -1,0 +1,20 @@
+evaluation:
+  id: eval_004_exp_004_ensemble_blending_paper
+  date: '2026-09-27'
+  timestamp: '2026-09-27T14:48:24.371770'
+model:
+  experiment_id: exp_004_ensemble_blending_paper
+  name: Ensemble Blending (RF + GB)
+  path: /content/drive/MyDrive/do_an/phase5_experiments/exp_004_ensemble_blending_paper/model/model.joblib
+dataset:
+  name: CICIoT2023
+  validation_samples: 26706
+  test_samples: 26707
+reproducibility:
+  phase5_training_seed: 123
+  holdout_split_seed: 123
+  val_test_split_seed: 123
+  stability_seeds:
+  - 42
+  - 123
+  - 2024

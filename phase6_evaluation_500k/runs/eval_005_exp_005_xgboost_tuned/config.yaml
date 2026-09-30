@@ -1,0 +1,44 @@
+evaluation:
+  id: eval_005_exp_005_xgboost_tuned
+  date: '2026-09-28'
+  timestamp: '2026-09-28T14:21:18.809620'
+  model_loading_time_sec: 0.1793
+model:
+  experiment_id: exp_005_xgboost_tuned
+  name: exp_005_xgboost_tuned
+  model_path: /content/drive/MyDrive/do_an/phase5_experiments_500k/exp_005_xgboost_tuned/model/model.pkl
+  hyperparameters: {}
+dataset:
+  name: CICIoT2023
+  classes: 8
+  class_names:
+  - BruteForce
+  - DDoS
+  - DoS
+  - Mirai
+  - Normal
+  - Recon
+  - Spoofing
+  - Web-Based
+  validation_samples: 65518
+  test_samples: 65519
+evaluation_sets:
+  validation: true
+  test: true
+metrics:
+- accuracy
+- precision_macro
+- recall_macro
+- f1_macro
+- f1_weighted
+- roc_auc_macro
+- confusion_matrix
+- inference_latency
+reproducibility:
+  phase5_training_seed: 123
+  holdout_split_seed: 123
+  val_test_split_seed: 123
+  stability_seeds:
+  - 42
+  - 123
+  - 2024

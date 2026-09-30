@@ -1,0 +1,66 @@
+{
+    "BruteForce": {
+        "optimal_threshold": 0.775,
+        "test_baseline_f1": 0.7282,
+        "test_optimized_f1": 0.7876,
+        "f1_delta": 0.0594,
+        "test_optimized_precision": 0.9254,
+        "test_optimized_recall": 0.6856
+    },
+    "DDoS": {
+        "optimal_threshold": 0.175,
+        "test_baseline_f1": 0.9972,
+        "test_optimized_f1": 0.9976,
+        "f1_delta": 0.0004,
+        "test_optimized_precision": 0.9989,
+        "test_optimized_recall": 0.9962
+    },
+    "DoS": {
+        "optimal_threshold": 0.5,
+        "test_baseline_f1": 0.9994,
+        "test_optimized_f1": 0.9994,
+        "f1_delta": 0.0,
+        "test_optimized_precision": 1.0,
+        "test_optimized_recall": 0.9987
+    },
+    "Mirai": {
+        "optimal_threshold": 0.5,
+        "test_baseline_f1": 0.9994,
+        "test_optimized_f1": 0.9994,
+        "f1_delta": 0.0,
+        "test_optimized_precision": 0.9996,
+        "test_optimized_recall": 0.9992
+    },
+    "Normal": {
+        "optimal_threshold": 0.675,
+        "test_baseline_f1": 0.7754,
+        "test_optimized_f1": 0.8081,
+        "f1_delta": 0.0327,
+        "test_optimized_precision": 0.8336,
+        "test_optimized_recall": 0.7842
+    },
+    "Recon": {
+        "optimal_threshold": 0.375,
+        "test_baseline_f1": 0.862,
+        "test_optimized_f1": 0.8632,
+        "f1_delta": 0.0012,
+        "test_optimized_precision": 0.9529,
+        "test_optimized_recall": 0.789
+    },
+    "Spoofing": {
+        "optimal_threshold": 0.6,
+        "test_baseline_f1": 0.8598,
+        "test_optimized_f1": 0.8604,
+        "f1_delta": 0.0006,
+        "test_optimized_precision": 0.9472,
+        "test_optimized_recall": 0.7882
+    },
+    "Web-Based": {
+        "optimal_threshold": 0.2,
+        "test_baseline_f1": 0.8579,
+        "test_optimized_f1": 0.8865,
+        "f1_delta": 0.0285,
+        "test_optimized_precision": 0.8344,
+        "test_optimized_recall": 0.9455
+    }
+}

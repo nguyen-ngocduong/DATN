@@ -1,0 +1,15 @@
+experiment_id: exp_002_xgboost_baseline
+experiment_name: Gradient Boosting Baseline
+method: Gradient Boosting
+phase: 5
+status: completed
+created_at: '2026-09-27T16:20:00'
+description: 'Gradient Boosting baseline (Table 2 config: lr=0.1, max_depth=3, n_est=100)'
+linked_evaluation_run: eval_002_exp_002_xgboost_baseline
+config_path: exp_002_xgboost_baseline/config/hyperparameters.yaml
+metrics_reference: metrics/metrics.json
+config_reference: config/hyperparameters.yaml
+primary_metric:
+  f1_macro: 0.7241
+  accuracy: 0.7811
+  roc_auc: 0.9784

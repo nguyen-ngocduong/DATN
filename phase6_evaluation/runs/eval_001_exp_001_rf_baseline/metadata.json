@@ -1,0 +1,26 @@
+{
+    "eval_id": "eval_001_exp_001_rf_baseline",
+    "phase5_experiment_id": "exp_001_rf_baseline",
+    "model_type": "RandomForestClassifier",
+    "reproducibility": {
+        "phase5_training_seed": 123,
+        "holdout_split_seed": 123,
+        "val_test_split_seed": 123
+    },
+    "n_features": 25,
+    "val_metrics": {
+        "accuracy": 0.9594,
+        "f1_macro": 0.922,
+        "roc_auc_macro": 0.9976
+    },
+    "test_metrics": {
+        "accuracy": 0.961,
+        "f1_macro": 0.9234,
+        "roc_auc_macro": 0.9973
+    },
+    "latency_metrics": {
+        "median_ms": 34.86539450000237,
+        "throughput_sps": 28.68173483595409
+    },
+    "threshold_optimization_ref": "threshold_optimization.json"
+}

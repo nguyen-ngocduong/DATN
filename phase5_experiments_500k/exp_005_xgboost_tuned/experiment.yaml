@@ -1,0 +1,28 @@
+experiment_id: exp_005_xgboost_tuned
+experiment_name: XGBoost / Gradient Boosting Tuned
+description: Hyperparameter-tuned boosting model with deeper depth=6 and 150 iterations
+status: completed
+timestamp_start: '2026-09-27T16:37:37.198729'
+timestamp_end: '2026-09-27T16:38:58.659734'
+total_duration_sec: 81.46
+method: XGBoost / Gradient Boosting Tuned
+task: 8-Class IoT Attack Classification (IEEE Access CICIoT2023)
+data:
+  features_count: 25
+  train_samples: 213649
+  test_samples: 53413
+  classes:
+  - BruteForce
+  - DDoS
+  - DoS
+  - Mirai
+  - Normal
+  - Recon
+  - Spoofing
+  - Web-Based
+primary_metric:
+  f1_macro: 0.938
+  accuracy: 0.9698
+  roc_auc: 0.9986
+metrics_reference: metrics/metrics.json
+config_reference: config/hyperparameters.yaml

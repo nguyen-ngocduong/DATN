@@ -1,0 +1,26 @@
+{
+    "eval_id": "eval_003_exp_003_decision_tree_baseline",
+    "phase5_experiment_id": "exp_003_decision_tree_baseline",
+    "model_type": "DecisionTreeClassifier",
+    "reproducibility": {
+        "phase5_training_seed": 123,
+        "holdout_split_seed": 123,
+        "val_test_split_seed": 123
+    },
+    "n_features": 25,
+    "val_metrics": {
+        "accuracy": 0.9357,
+        "f1_macro": 0.8803,
+        "roc_auc_macro": 0.9919
+    },
+    "test_metrics": {
+        "accuracy": 0.9351,
+        "f1_macro": 0.8782,
+        "roc_auc_macro": 0.9908
+    },
+    "latency_metrics": {
+        "median_ms": 0.1648659999773372,
+        "throughput_sps": 6065.532008646185
+    },
+    "threshold_optimization_ref": "threshold_optimization.json"
+}

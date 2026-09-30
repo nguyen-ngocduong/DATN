@@ -1,0 +1,10 @@
+voting: soft
+estimators:
+- DecisionTree (max_depth=12)
+- RandomForest (n_est=60)
+- GradientBoosting (max_iter=60)
+weights:
+- 1
+- 2
+- 2
+random_state: 123

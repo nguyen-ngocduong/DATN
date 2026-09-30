@@ -1,20 +1,2 @@
-[2026-09-27 16:20:04,918] INFO: ===========================================================================
-[2026-09-27 16:20:04,918] INFO: STARTING EXPERIMENT: [exp_002_xgboost_baseline]
-[2026-09-27 16:20:04,918] INFO: Method: Gradient Boosting Baseline
-[2026-09-27 16:20:04,918] INFO: Description: Gradient Boosting baseline (Table 2 config: lr=0.1, max_depth=3, n_est=100)
-[2026-09-27 16:20:04,918] INFO: ===========================================================================
-[2026-09-27 16:20:04,918] INFO: Training Gradient Boosting Baseline on 204,412 samples...
-[2026-09-27 16:20:29,729] INFO: Training completed in 24.81 seconds.
-[2026-09-27 16:20:29,729] INFO: Predicting on 51,103 test samples...
-[2026-09-27 16:20:30,219] INFO: Inference completed in 0.4896 seconds.
-[2026-09-27 16:20:31,112] INFO: Accuracy:    78.11%
-[2026-09-27 16:20:31,112] INFO: ROC-AUC:     0.9784
-[2026-09-27 16:20:31,112] INFO: Precision:   70.76%
-[2026-09-27 16:20:31,112] INFO: Recall:      78.93%
-[2026-09-27 16:20:31,112] INFO: F1 (Macro):  72.41%
-[2026-09-27 16:20:31,112] INFO: F1 (Wtd):    79.28%
-[2026-09-27 16:20:31,317] INFO: Model checkpoint saved to: phase5_experiments/exp_002_xgboost_baseline/model/model.pkl
-[2026-09-27 16:20:31,825] INFO: Confusion matrix saved to: phase5_experiments/exp_002_xgboost_baseline/metrics/confusion_matrix.png
-[2026-09-27 16:20:31,826] INFO: Experiment config saved to: phase5_experiments/exp_002_xgboost_baseline/config.yaml
-[2026-09-27 16:20:31,975] INFO: Experiment [exp_002_xgboost_baseline] completed successfully!
-
+Experiment [exp_002_xgboost_baseline] completed at 2026-09-27T14:38:02.980739
+Accuracy: 0.9336, F1-Macro: 0.8730, Training Time: 29.66s

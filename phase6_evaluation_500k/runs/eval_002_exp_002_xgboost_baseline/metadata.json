@@ -1,0 +1,75 @@
+{
+    "eval_id": "eval_002_exp_002_xgboost_baseline",
+    "phase5_experiment_id": "exp_002_xgboost_baseline",
+    "model_type": "HistGradientBoostingClassifier",
+    "reproducibility": {
+        "phase5_training_seed": 123,
+        "holdout_split_seed": 123,
+        "val_test_split_seed": 123
+    },
+    "n_features": 25,
+    "feature_names": [
+        "fin_flag_number",
+        "IAT",
+        "syn_flag_number",
+        "ICMP",
+        "psh_flag_number",
+        "AVG",
+        "Min",
+        "UDP",
+        "remote_access",
+        "Header_Length",
+        "Protocol Type",
+        "total_counts",
+        "avg_packet_size",
+        "header_to_payload_ratio",
+        "TCP",
+        "total_flags",
+        "fin_count",
+        "ack_count",
+        "Variance",
+        "Srate",
+        "flow_duration",
+        "HTTP",
+        "syn_count",
+        "duration_ratio",
+        "urg_count"
+    ],
+    "val_metrics": {
+        "accuracy": 0.9494,
+        "f1_macro": 0.8857,
+        "f1_weighted": 0.9505,
+        "roc_auc_macro": 0.9964,
+        "eval_duration_sec": 7.5446
+    },
+    "test_metrics": {
+        "accuracy": 0.9509,
+        "precision_macro": 0.8735,
+        "recall_macro": 0.9182,
+        "f1_macro": 0.8897,
+        "f1_weighted": 0.9519,
+        "roc_auc_macro": 0.9965,
+        "eval_duration_sec": 6.635
+    },
+    "latency_metrics": {
+        "single_sample_latency_ms": {
+            "mean": 12.0475,
+            "median_p50": 10.2961,
+            "p95": 17.2872,
+            "p99": 20.0072,
+            "min": 9.2817,
+            "max": 23.539
+        },
+        "batch_performance": {
+            "batch_size": 65519,
+            "batch_total_time_sec": 3.2681,
+            "throughput_samples_per_sec": 20048.17,
+            "batch_ms_per_sample": 0.0499
+        },
+        "system_environment": {
+            "python_version": "3.13.15",
+            "scikit_learn_version": "1.6.0",
+            "timestamp": "2026-09-28T14:18:42.476250"
+        }
+    }
+}

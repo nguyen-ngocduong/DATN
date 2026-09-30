@@ -1,0 +1,6 @@
+voting: soft
+estimators:
+- Decision Tree
+- Random Forest
+- Gradient Boosting
+aggregation: avg_prob_i = sum_prob_i / 3 (Equation 17 in Paper)

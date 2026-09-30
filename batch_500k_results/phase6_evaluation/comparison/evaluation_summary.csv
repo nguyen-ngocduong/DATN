@@ -1,0 +1,6 @@
+Eval ID,Phase 5 Experiment,Model Name,Val Acc,Val F1-Macro,Val ROC-AUC,Test Acc,Test F1-Macro,Test F1-Wtd,Test ROC-AUC,Test Prec-Macro,Test Rec-Macro,Latency Median (ms),Throughput (samples/s)
+eval_005_exp_005_xgboost_tuned,exp_005_xgboost_tuned,exp_005_xgboost_tuned,0.9748,0.9448,0.9988,0.9753,0.9467,0.9753,0.9988,0.9384,0.9571,14.9256,7701.64
+eval_001_exp_001_rf_baseline,exp_001_rf_baseline,exp_001_rf_baseline,0.968,0.9307,0.9977,0.9679,0.9311,0.968,0.9979,0.9251,0.9417,35.2706,94992.72
+eval_004_exp_004_ensemble_blending_paper,exp_004_ensemble_blending_paper,exp_004_ensemble_blending_paper,0.962,0.9152,0.9975,0.9632,0.918,0.9635,0.9976,0.9092,0.9344,48.3308,16512.15
+eval_003_exp_003_decision_tree_baseline,exp_003_decision_tree_baseline,exp_003_decision_tree_baseline,0.9476,0.8919,0.9923,0.9465,0.89,0.947,0.9925,0.8833,0.9017,1.458,5036361.21
+eval_002_exp_002_xgboost_baseline,exp_002_xgboost_baseline,exp_002_xgboost_baseline,0.9494,0.8857,0.9964,0.9509,0.8897,0.9519,0.9965,0.8735,0.9182,10.2961,20048.17

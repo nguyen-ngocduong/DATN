@@ -1,0 +1,28 @@
+experiment_id: exp_003_decision_tree_baseline
+experiment_name: Decision Tree Baseline
+description: Decision Tree baseline classifier (Level 1 base model from paper)
+status: completed
+timestamp_start: '2026-09-28T14:08:44.348971'
+timestamp_end: '2026-09-28T14:09:04.416354'
+total_duration_sec: 20.07
+method: Decision Tree Baseline
+task: 8-Class IoT Attack Classification (IEEE Access CICIoT2023)
+data:
+  features_count: 25
+  train_samples: 524145
+  test_samples: 131037
+  classes:
+  - BruteForce
+  - DDoS
+  - DoS
+  - Mirai
+  - Normal
+  - Recon
+  - Spoofing
+  - Web-Based
+primary_metric:
+  f1_macro: 0.891
+  accuracy: 0.9471
+  roc_auc: 0.9924
+metrics_reference: metrics/metrics.json
+config_reference: config/hyperparameters.yaml

@@ -1,13 +1,13 @@
 {
     "experiment_id": "exp_001_rf_baseline",
     "method": "Random Forest Baseline",
-    "accuracy": 0.8615,
-    "roc_auc_ovr_macro": 0.9919,
-    "precision_macro": 0.815,
-    "recall_macro": 0.8713,
-    "f1_macro": 0.8326,
-    "f1_weighted": 0.8671,
-    "training_time_sec": 10.6077,
-    "testing_time_sec": 0.1556,
-    "test_samples": 51103
+    "accuracy": 0.9602,
+    "roc_auc_ovr_macro": 0.9975,
+    "precision_macro": 0.9164,
+    "recall_macro": 0.9326,
+    "f1_macro": 0.9227,
+    "f1_weighted": 0.9607,
+    "training_time_sec": 94.7823,
+    "testing_time_sec": 1.0391,
+    "test_samples": 53413
 }

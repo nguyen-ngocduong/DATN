@@ -1,0 +1,39 @@
+{
+    "evaluation_id": "eval_004_exp_004_ensemble_blending_paper",
+    "phase5_experiment_id": "exp_004_ensemble_blending_paper",
+    "model_type": "VotingClassifier",
+    "validation_summary": {
+        "accuracy": 0.9515,
+        "precision_macro": 0.8933,
+        "recall_macro": 0.922,
+        "f1_macro": 0.9043,
+        "f1_weighted": 0.9524,
+        "roc_auc_macro": 0.997,
+        "eval_duration_sec": 3.0493
+    },
+    "test_summary": {
+        "accuracy": 0.9519,
+        "precision_macro": 0.8918,
+        "recall_macro": 0.9242,
+        "f1_macro": 0.9043,
+        "f1_weighted": 0.953,
+        "roc_auc_macro": 0.9969,
+        "eval_duration_sec": 2.47
+    },
+    "latency_performance": {
+        "single_sample_latency_ms": {
+            "mean": 37.7766,
+            "median_p50": 36.4926,
+            "p95": 45.4796
+        },
+        "batch_performance": {
+            "throughput_samples_per_sec": 21688.79,
+            "batch_ms_per_sample": 0.0461
+        }
+    },
+    "system_environment": {
+        "python_version": "3.13.5",
+        "scikit_learn_version": "1.9.0",
+        "timestamp": "2026-09-27T17:03:00"
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "roc_auc_macro": 0.9925,
+    "roc_auc_weighted": 0.9961,
+    "per_class_roc_auc": {
+        "BruteForce": 0.993,
+        "DDoS": 0.9995,
+        "DoS": 0.9997,
+        "Mirai": 0.9994,
+        "Normal": 0.9831,
+        "Recon": 0.988,
+        "Spoofing": 0.9852,
+        "Web-Based": 0.9921
+    }
+}

@@ -1,0 +1,5 @@
+learning_rate: 0.1
+max_iter: 100
+max_depth: 3
+class_weight: balanced
+random_state: 123

@@ -1,0 +1,20 @@
+[2026-09-27 16:20:37,360] INFO: ===========================================================================
+[2026-09-27 16:20:37,360] INFO: STARTING EXPERIMENT: [exp_004_ensemble_blending_paper]
+[2026-09-27 16:20:37,360] INFO: Method: Ensemble Blending Model
+[2026-09-27 16:20:37,360] INFO: Description: Proposed Ensemble Blending Model with Soft Voting combining DT + RF + GB (Algorithm 1)
+[2026-09-27 16:20:37,360] INFO: ===========================================================================
+[2026-09-27 16:20:37,360] INFO: Training Ensemble Blending Model on 204,412 samples...
+[2026-09-27 16:21:52,685] INFO: Training completed in 75.33 seconds.
+[2026-09-27 16:21:52,688] INFO: Predicting on 51,103 test samples...
+[2026-09-27 16:21:53,229] INFO: Inference completed in 0.5411 seconds.
+[2026-09-27 16:21:54,319] INFO: Accuracy:    84.09%
+[2026-09-27 16:21:54,319] INFO: ROC-AUC:     0.9879
+[2026-09-27 16:21:54,319] INFO: Precision:   77.37%
+[2026-09-27 16:21:54,320] INFO: Recall:      84.02%
+[2026-09-27 16:21:54,320] INFO: F1 (Macro):  79.34%
+[2026-09-27 16:21:54,320] INFO: F1 (Wtd):    84.80%
+[2026-09-27 16:21:56,457] INFO: Model checkpoint saved to: phase5_experiments/exp_004_ensemble_blending_paper/model/model.pkl
+[2026-09-27 16:21:56,888] INFO: Confusion matrix saved to: phase5_experiments/exp_004_ensemble_blending_paper/metrics/confusion_matrix.png
+[2026-09-27 16:21:56,890] INFO: Experiment config saved to: phase5_experiments/exp_004_ensemble_blending_paper/config.yaml
+[2026-09-27 16:21:57,040] INFO: Experiment [exp_004_ensemble_blending_paper] completed successfully!
+

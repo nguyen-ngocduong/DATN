@@ -1,0 +1,60 @@
+phase: 'Phase 6: Rigorous Validation & Independent Testing'
+dataset: CICIoT2023 8-Class IoT Attack Dataset
+last_updated: '2026-09-27T14:49:01.807138'
+best_eval_id: eval_005_exp_005_xgboost_tuned
+evaluation_runs:
+- Eval ID: eval_005_exp_005_xgboost_tuned
+  Phase 5 Experiment: exp_005_xgboost_tuned
+  Model Name: XGBoost / Gradient Boosting Tuned
+  Val Acc: 0.9705
+  Val F1-Macro: 0.9403
+  Val ROC-AUC: 0.9987
+  Test Acc: 0.969
+  Test F1-Macro: 0.9357
+  Test ROC-AUC: 0.9985
+  Latency Median (ms): 15.112033500145117
+  Throughput (samples/s): 66.17243139319386
+- Eval ID: eval_001_exp_001_rf_baseline
+  Phase 5 Experiment: exp_001_rf_baseline
+  Model Name: Random Forest Baseline
+  Val Acc: 0.9594
+  Val F1-Macro: 0.922
+  Val ROC-AUC: 0.9976
+  Test Acc: 0.961
+  Test F1-Macro: 0.9234
+  Test ROC-AUC: 0.9973
+  Latency Median (ms): 34.86539450000237
+  Throughput (samples/s): 28.68173483595409
+- Eval ID: eval_004_exp_004_ensemble_blending_paper
+  Phase 5 Experiment: exp_004_ensemble_blending_paper
+  Model Name: Ensemble Blending (RF + GB)
+  Val Acc: 0.9534
+  Val F1-Macro: 0.9079
+  Val ROC-AUC: 0.9971
+  Test Acc: 0.9532
+  Test F1-Macro: 0.9064
+  Test ROC-AUC: 0.9967
+  Latency Median (ms): 41.73980049995407
+  Throughput (samples/s): 23.957948720936038
+- Eval ID: eval_003_exp_003_decision_tree_baseline
+  Phase 5 Experiment: exp_003_decision_tree_baseline
+  Model Name: Decision Tree Baseline
+  Val Acc: 0.9357
+  Val F1-Macro: 0.8803
+  Val ROC-AUC: 0.9919
+  Test Acc: 0.9351
+  Test F1-Macro: 0.8782
+  Test ROC-AUC: 0.9908
+  Latency Median (ms): 0.1648659999773372
+  Throughput (samples/s): 6065.532008646185
+- Eval ID: eval_002_exp_002_xgboost_baseline
+  Phase 5 Experiment: exp_002_xgboost_baseline
+  Model Name: Gradient Boosting Baseline
+  Val Acc: 0.9342
+  Val F1-Macro: 0.8747
+  Val ROC-AUC: 0.9953
+  Test Acc: 0.9329
+  Test F1-Macro: 0.8714
+  Test ROC-AUC: 0.9948
+  Latency Median (ms): 9.666407499935303
+  Throughput (samples/s): 103.45104942106909

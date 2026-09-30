@@ -1,0 +1,67 @@
+[
+    {
+        "experiment_id": "exp_005_xgboost_tuned",
+        "method": "XGBoost / Gradient Boosting Tuned",
+        "accuracy": 0.9698,
+        "roc_auc_ovr_macro": 0.9986,
+        "precision_macro": 0.9286,
+        "recall_macro": 0.9494,
+        "f1_macro": 0.938,
+        "f1_weighted": 0.9701,
+        "training_time_sec": 63.76,
+        "testing_time_sec": 7.346,
+        "test_samples": 53413
+    },
+    {
+        "experiment_id": "exp_001_rf_baseline",
+        "method": "Random Forest Baseline",
+        "accuracy": 0.9602,
+        "roc_auc_ovr_macro": 0.9975,
+        "precision_macro": 0.9164,
+        "recall_macro": 0.9326,
+        "f1_macro": 0.9227,
+        "f1_weighted": 0.9607,
+        "training_time_sec": 92.6666,
+        "testing_time_sec": 1.1168,
+        "test_samples": 53413
+    },
+    {
+        "experiment_id": "exp_004_ensemble_blending_paper",
+        "method": "Ensemble Blending Model",
+        "accuracy": 0.9517,
+        "roc_auc_ovr_macro": 0.9969,
+        "precision_macro": 0.8924,
+        "recall_macro": 0.9231,
+        "f1_macro": 0.9042,
+        "f1_weighted": 0.9527,
+        "training_time_sec": 127.9334,
+        "testing_time_sec": 4.835,
+        "test_samples": 53413
+    },
+    {
+        "experiment_id": "exp_003_decision_tree_baseline",
+        "method": "Decision Tree Baseline",
+        "accuracy": 0.9354,
+        "roc_auc_ovr_macro": 0.9913,
+        "precision_macro": 0.8665,
+        "recall_macro": 0.9051,
+        "f1_macro": 0.8793,
+        "f1_weighted": 0.9371,
+        "training_time_sec": 9.2345,
+        "testing_time_sec": 0.0086,
+        "test_samples": 53413
+    },
+    {
+        "experiment_id": "exp_002_xgboost_baseline",
+        "method": "Gradient Boosting Baseline",
+        "accuracy": 0.9336,
+        "roc_auc_ovr_macro": 0.9951,
+        "precision_macro": 0.8569,
+        "recall_macro": 0.9023,
+        "f1_macro": 0.873,
+        "f1_weighted": 0.9354,
+        "training_time_sec": 29.8559,
+        "testing_time_sec": 2.7809,
+        "test_samples": 53413
+    }
+]

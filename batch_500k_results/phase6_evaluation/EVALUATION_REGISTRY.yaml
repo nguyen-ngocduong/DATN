@@ -1,0 +1,50 @@
+phase: 'Phase 6: Rigorous Validation & Independent Testing'
+dataset: CICIoT2023 8-Class IoT Attack Dataset
+last_updated: '2026-09-28T14:21:20.371328'
+best_eval_id: eval_005_exp_005_xgboost_tuned
+evaluation_runs:
+- eval_id: eval_005_exp_005_xgboost_tuned
+  model_name: exp_005_xgboost_tuned
+  phase5_experiment_id: exp_005_xgboost_tuned
+  val_f1_macro: 0.9448
+  val_accuracy: 0.9748
+  test_f1_macro: 0.9467
+  test_accuracy: 0.9753
+  test_roc_auc: 0.9988
+  latency_p50_ms: 14.9256
+- eval_id: eval_001_exp_001_rf_baseline
+  model_name: exp_001_rf_baseline
+  phase5_experiment_id: exp_001_rf_baseline
+  val_f1_macro: 0.9307
+  val_accuracy: 0.968
+  test_f1_macro: 0.9311
+  test_accuracy: 0.9679
+  test_roc_auc: 0.9979
+  latency_p50_ms: 35.2706
+- eval_id: eval_004_exp_004_ensemble_blending_paper
+  model_name: exp_004_ensemble_blending_paper
+  phase5_experiment_id: exp_004_ensemble_blending_paper
+  val_f1_macro: 0.9152
+  val_accuracy: 0.962
+  test_f1_macro: 0.918
+  test_accuracy: 0.9632
+  test_roc_auc: 0.9976
+  latency_p50_ms: 48.3308
+- eval_id: eval_003_exp_003_decision_tree_baseline
+  model_name: exp_003_decision_tree_baseline
+  phase5_experiment_id: exp_003_decision_tree_baseline
+  val_f1_macro: 0.8919
+  val_accuracy: 0.9476
+  test_f1_macro: 0.89
+  test_accuracy: 0.9465
+  test_roc_auc: 0.9925
+  latency_p50_ms: 1.458
+- eval_id: eval_002_exp_002_xgboost_baseline
+  model_name: exp_002_xgboost_baseline
+  phase5_experiment_id: exp_002_xgboost_baseline
+  val_f1_macro: 0.8857
+  val_accuracy: 0.9494
+  test_f1_macro: 0.8897
+  test_accuracy: 0.9509
+  test_roc_auc: 0.9965
+  latency_p50_ms: 10.2961

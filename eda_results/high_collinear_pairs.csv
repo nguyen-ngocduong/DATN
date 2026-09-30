@@ -1,0 +1,29 @@
+Feature_1,Feature_2,Correlation
+Rate,Srate,1.0
+SSH,remote_access,1.0
+Std,Radius,1.0
+IPv,LLC,1.0
+HTTPS,is_encrypted,0.9998
+Number,Weight,0.9997
+IAT,Weight,0.9988
+IAT,Number,0.9978
+AVG,avg_packet_size,0.9951
+rst_count,total_counts,0.9914
+fin_flag_number,ack_count,0.9847
+fin_flag_number,rst_flag_number,0.9761
+Magnitue,avg_packet_size,0.9736
+AVG,Magnitue,0.9683
+syn_count,syn_ack_ratio,0.964
+rst_flag_number,ack_count,0.9612
+Tot size,avg_packet_size,0.9557
+Tot sum,avg_packet_size,0.9537
+DNS,network_mgmt,0.9535
+Max,Std,0.9509
+Max,Radius,0.9509
+AVG,Tot size,0.9443
+Tot size,Magnitue,0.9321
+Tot sum,AVG,0.9318
+rst_flag_number,fin_count,0.9279
+Tot sum,Magnitue,0.9253
+fin_flag_number,fin_count,0.9127
+ack_count,fin_count,0.9112

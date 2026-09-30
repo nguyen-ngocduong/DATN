@@ -1,0 +1,87 @@
+version: v001
+feature_selection_strategy: Consensus Filter & GBDT Hybrid Importance
+initial_features_count: 58
+selected_features_count: 25
+selection_stages:
+- stage: 1
+  name: Variance Threshold Filtering
+  threshold: 0.001
+  action: Eliminated quasi-constant features carrying zero discriminative variance.
+- stage: 2
+  name: Collinearity Pruning
+  threshold: 0.9
+  metric: Pearson Correlation
+  action: Greedy pruning of highly redundant feature pairs (|r| >= 0.90).
+- stage: 3
+  name: Consensus Tree Importance
+  models:
+  - Random Forest (Gini MDI)
+  - LightGBM / XGBoost (Split Gain)
+  formula: Consensus(f) = (Norm(I_RF(f)) + Norm(I_GBDT(f))) / 2
+- stage: 4
+  name: Pareto Top-N Cutoff
+  cumulative_importance_coverage: '>= 95%'
+  retained_features: 25
+selected_features:
+- fin_flag_number
+- ICMP
+- Tot size
+- syn_flag_number
+- header_to_payload_ratio
+- psh_flag_number
+- Min
+- Header_Length
+- Tot sum
+- Protocol Type
+- total_counts
+- remote_access
+- UDP
+- flow_duration
+- ack_count
+- TCP
+- rst_syn_ratio
+- Srate
+- Variance
+- fin_count
+- HTTP
+- Covariance
+- syn_ack_ratio
+- Radius
+- syn_count
+attack_class_mapping_relevance:
+  DDoS_DoS:
+  - Tot size
+  - Tot sum
+  - Rate
+  - total_counts
+  - syn_flag_number
+  - ack_count
+  - flow_duration
+  Mirai:
+  - Protocol Type
+  - transport_traffic
+  - UDP
+  - Header_Length
+  - psh_flag_number
+  Recon:
+  - ICMP
+  - remote_access
+  - header_to_payload_ratio
+  - Min
+  - Variance
+  Spoofing:
+  - ARP
+  - DNS
+  - rst_syn_ratio
+  - Covariance
+  - Radius
+  Web_Based:
+  - HTTP
+  - HTTPS
+  - web_traffic
+  - fin_flag_number
+  BruteForce:
+  - remote_access
+  - syn_ack_ratio
+  - Duration
+  - total_counts

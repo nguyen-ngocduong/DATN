@@ -1,13 +1,13 @@
 {
     "experiment_id": "exp_002_xgboost_baseline",
     "method": "Gradient Boosting Baseline",
-    "accuracy": 0.7811,
-    "roc_auc_ovr_macro": 0.9784,
-    "precision_macro": 0.7076,
-    "recall_macro": 0.7893,
-    "f1_macro": 0.7241,
-    "f1_weighted": 0.7928,
-    "training_time_sec": 24.8108,
-    "testing_time_sec": 0.4896,
-    "test_samples": 51103
+    "accuracy": 0.9336,
+    "roc_auc_ovr_macro": 0.9951,
+    "precision_macro": 0.8569,
+    "recall_macro": 0.9023,
+    "f1_macro": 0.873,
+    "f1_weighted": 0.9354,
+    "training_time_sec": 29.6554,
+    "testing_time_sec": 3.1997,
+    "test_samples": 53413
 }

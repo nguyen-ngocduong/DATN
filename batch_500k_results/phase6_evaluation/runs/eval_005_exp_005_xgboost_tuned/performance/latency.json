@@ -1,0 +1,21 @@
+{
+    "single_sample_latency_ms": {
+        "mean": 17.5047,
+        "median_p50": 14.9256,
+        "p95": 25.1094,
+        "p99": 30.3546,
+        "min": 14.1148,
+        "max": 34.2819
+    },
+    "batch_performance": {
+        "batch_size": 65519,
+        "batch_total_time_sec": 8.5071,
+        "throughput_samples_per_sec": 7701.64,
+        "batch_ms_per_sample": 0.1298
+    },
+    "system_environment": {
+        "python_version": "3.13.15",
+        "scikit_learn_version": "1.6.0",
+        "timestamp": "2026-09-28T14:21:18.791093"
+    }
+}

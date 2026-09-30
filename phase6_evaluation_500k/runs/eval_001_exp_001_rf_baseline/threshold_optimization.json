@@ -1,0 +1,82 @@
+{
+    "BruteForce": {
+        "optimal_threshold": 0.45,
+        "val_baseline_f1": 0.9377,
+        "val_optimized_f1": 0.9448,
+        "test_baseline_f1": 0.9387,
+        "test_optimized_f1": 0.9446,
+        "f1_delta": 0.0059,
+        "test_optimized_precision": 0.9619,
+        "test_optimized_recall": 0.9279
+    },
+    "DDoS": {
+        "optimal_threshold": 0.25,
+        "val_baseline_f1": 0.9965,
+        "val_optimized_f1": 0.999,
+        "test_baseline_f1": 0.996,
+        "test_optimized_f1": 0.999,
+        "f1_delta": 0.003,
+        "test_optimized_precision": 0.9992,
+        "test_optimized_recall": 0.9988
+    },
+    "DoS": {
+        "optimal_threshold": 0.275,
+        "val_baseline_f1": 0.9976,
+        "val_optimized_f1": 0.9986,
+        "test_baseline_f1": 0.9972,
+        "test_optimized_f1": 0.9983,
+        "f1_delta": 0.0012,
+        "test_optimized_precision": 0.9992,
+        "test_optimized_recall": 0.9975
+    },
+    "Mirai": {
+        "optimal_threshold": 0.15,
+        "val_baseline_f1": 0.9962,
+        "val_optimized_f1": 0.9987,
+        "test_baseline_f1": 0.9962,
+        "test_optimized_f1": 0.9983,
+        "f1_delta": 0.0021,
+        "test_optimized_precision": 0.9983,
+        "test_optimized_recall": 0.9983
+    },
+    "Normal": {
+        "optimal_threshold": 0.45,
+        "val_baseline_f1": 0.8225,
+        "val_optimized_f1": 0.8282,
+        "test_baseline_f1": 0.8453,
+        "test_optimized_f1": 0.8462,
+        "f1_delta": 0.0009,
+        "test_optimized_precision": 0.8559,
+        "test_optimized_recall": 0.8367
+    },
+    "Recon": {
+        "optimal_threshold": 0.275,
+        "val_baseline_f1": 0.842,
+        "val_optimized_f1": 0.9157,
+        "test_baseline_f1": 0.848,
+        "test_optimized_f1": 0.9151,
+        "f1_delta": 0.0671,
+        "test_optimized_precision": 0.928,
+        "test_optimized_recall": 0.9025
+    },
+    "Spoofing": {
+        "optimal_threshold": 0.4,
+        "val_baseline_f1": 0.8655,
+        "val_optimized_f1": 0.8774,
+        "test_baseline_f1": 0.8612,
+        "test_optimized_f1": 0.8726,
+        "f1_delta": 0.0114,
+        "test_optimized_precision": 0.9588,
+        "test_optimized_recall": 0.8007
+    },
+    "Web-Based": {
+        "optimal_threshold": 0.325,
+        "val_baseline_f1": 0.862,
+        "val_optimized_f1": 0.9283,
+        "test_baseline_f1": 0.8636,
+        "test_optimized_f1": 0.9275,
+        "f1_delta": 0.0639,
+        "test_optimized_precision": 0.9011,
+        "test_optimized_recall": 0.9555
+    }
+}

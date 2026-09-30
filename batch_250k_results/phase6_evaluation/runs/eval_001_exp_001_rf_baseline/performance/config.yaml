@@ -1,0 +1,6 @@
+benchmark:
+  batch_size: 26707
+  latency_unit: milliseconds (ms)
+  single_sample_iterations: 300
+  throughput_unit: samples per second
+  warmup_samples: 30

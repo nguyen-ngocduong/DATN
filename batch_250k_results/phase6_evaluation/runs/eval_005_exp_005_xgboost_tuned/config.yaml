@@ -1,0 +1,33 @@
+evaluation:
+  id: eval_005_exp_005_xgboost_tuned
+  date: '2026-09-27'
+  timestamp: '2026-09-27T09:58:29.606010'
+model:
+  experiment_id: exp_005_xgboost_tuned
+  name: XGBoost / Gradient Boosting Tuned
+  model_path: /content/drive/MyDrive/do_an/phase5_experiments/exp_005_xgboost_tuned/model/model.pkl
+  hyperparameters:
+    learning_rate: 0.08
+    max_iter: 150
+    max_depth: 6
+    l2_regularization: 0.1
+    class_weight: balanced
+    random_state: 123
+dataset:
+  name: CICIoT2023
+  classes: 8
+  val_samples: 26706
+  test_samples: 26707
+evaluation_sets:
+  validation: true
+  test: true
+metrics:
+- accuracy
+- precision
+- recall
+- f1_macro
+- f1_weighted
+- roc_auc
+- confusion_matrix
+- inference_latency
+random_seed: 42

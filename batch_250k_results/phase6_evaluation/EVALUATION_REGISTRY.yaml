@@ -1,0 +1,51 @@
+evaluations:
+- eval_id: eval_005_exp_005_xgboost_tuned
+  phase5_experiment_id: exp_005_xgboost_tuned
+  model_name: XGBoost Tuned
+  rank: 1
+  status: champion
+  val_f1_macro: 0.9391
+  test_f1_macro: 0.937
+  test_accuracy: 0.9693
+  test_roc_auc: 0.9986
+  latency_p50_ms: 10.51
+- eval_id: eval_001_exp_001_rf_baseline
+  phase5_experiment_id: exp_001_rf_baseline
+  model_name: Random Forest Baseline
+  rank: 2
+  status: completed
+  val_f1_macro: 0.9221
+  test_f1_macro: 0.9234
+  test_accuracy: 0.9607
+  test_roc_auc: 0.9974
+  latency_p50_ms: 24.41
+- eval_id: eval_004_exp_004_ensemble_blending_paper
+  phase5_experiment_id: exp_004_ensemble_blending_paper
+  model_name: Ensemble Blending Model
+  rank: 3
+  status: completed
+  val_f1_macro: 0.9043
+  test_f1_macro: 0.9043
+  test_accuracy: 0.9519
+  test_roc_auc: 0.9969
+  latency_p50_ms: 36.49
+- eval_id: eval_003_exp_003_decision_tree_baseline
+  phase5_experiment_id: exp_003_decision_tree_baseline
+  model_name: Decision Tree Baseline
+  rank: 4
+  status: completed
+  val_f1_macro: 0.8794
+  test_f1_macro: 0.8793
+  test_accuracy: 0.935
+  test_roc_auc: 0.9914
+  latency_p50_ms: 0.77
+- eval_id: eval_002_exp_002_xgboost_baseline
+  phase5_experiment_id: exp_002_xgboost_baseline
+  model_name: Gradient Boosting Baseline
+  rank: 5
+  status: completed
+  val_f1_macro: 0.8749
+  test_f1_macro: 0.8712
+  test_accuracy: 0.9324
+  test_roc_auc: 0.9951
+  latency_p50_ms: 7.01

@@ -1,20 +1,2 @@
-[2026-09-27 16:19:51,500] INFO: ===========================================================================
-[2026-09-27 16:19:51,500] INFO: STARTING EXPERIMENT: [exp_001_rf_baseline]
-[2026-09-27 16:19:51,500] INFO: Method: Random Forest Baseline
-[2026-09-27 16:19:51,500] INFO: Description: Random Forest baseline with 100 estimators matching IEEE paper Section III
-[2026-09-27 16:19:51,500] INFO: ===========================================================================
-[2026-09-27 16:19:51,500] INFO: Training Random Forest Baseline on 204,412 samples...
-[2026-09-27 16:20:02,108] INFO: Training completed in 10.61 seconds.
-[2026-09-27 16:20:02,108] INFO: Predicting on 51,103 test samples...
-[2026-09-27 16:20:02,263] INFO: Inference completed in 0.1556 seconds.
-[2026-09-27 16:20:02,752] INFO: Accuracy:    86.15%
-[2026-09-27 16:20:02,752] INFO: ROC-AUC:     0.9919
-[2026-09-27 16:20:02,752] INFO: Precision:   81.50%
-[2026-09-27 16:20:02,752] INFO: Recall:      87.13%
-[2026-09-27 16:20:02,752] INFO: F1 (Macro):  83.26%
-[2026-09-27 16:20:02,752] INFO: F1 (Wtd):    86.71%
-[2026-09-27 16:20:04,220] INFO: Model checkpoint saved to: phase5_experiments/exp_001_rf_baseline/model/model.pkl
-[2026-09-27 16:20:04,738] INFO: Confusion matrix saved to: phase5_experiments/exp_001_rf_baseline/metrics/confusion_matrix.png
-[2026-09-27 16:20:04,740] INFO: Experiment config saved to: phase5_experiments/exp_001_rf_baseline/config.yaml
-[2026-09-27 16:20:04,917] INFO: Experiment [exp_001_rf_baseline] completed successfully!
-
+Experiment [exp_001_rf_baseline] completed at 2026-09-27T14:37:16.932598
+Accuracy: 0.9602, F1-Macro: 0.9227, Training Time: 94.78s

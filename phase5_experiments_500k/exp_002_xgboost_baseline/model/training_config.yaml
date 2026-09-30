@@ -1,0 +1,11 @@
+experiment_id: exp_002_xgboost_baseline
+model_name: Gradient Boosting Baseline
+model_class: HistGradientBoostingClassifier
+hyperparameters:
+  learning_rate: 0.1
+  max_iter: 100
+  max_depth: 3
+  class_weight: balanced
+  random_state: 123
+training_time_seconds: 29.8559
+timestamp: '2026-09-27T16:35:02.632936'

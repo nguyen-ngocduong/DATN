@@ -1,0 +1,39 @@
+{
+    "evaluation_id": "eval_002_exp_002_xgboost_baseline",
+    "phase5_experiment_id": "exp_002_xgboost_baseline",
+    "model_type": "HistGradientBoostingClassifier",
+    "validation_summary": {
+        "accuracy": 0.9348,
+        "precision_macro": 0.8592,
+        "recall_macro": 0.9032,
+        "f1_macro": 0.8749,
+        "f1_weighted": 0.9365,
+        "roc_auc_macro": 0.995,
+        "eval_duration_sec": 2.6463
+    },
+    "test_summary": {
+        "accuracy": 0.9324,
+        "precision_macro": 0.8547,
+        "recall_macro": 0.9015,
+        "f1_macro": 0.8712,
+        "f1_weighted": 0.9343,
+        "roc_auc_macro": 0.9951,
+        "eval_duration_sec": 2.1339
+    },
+    "latency_performance": {
+        "single_sample_latency_ms": {
+            "mean": 7.222,
+            "median_p50": 7.0118,
+            "p95": 8.5533
+        },
+        "batch_performance": {
+            "throughput_samples_per_sec": 24938.92,
+            "batch_ms_per_sample": 0.0401
+        }
+    },
+    "system_environment": {
+        "python_version": "3.13.5",
+        "scikit_learn_version": "1.9.0",
+        "timestamp": "2026-09-27T17:03:00"
+    }
+}

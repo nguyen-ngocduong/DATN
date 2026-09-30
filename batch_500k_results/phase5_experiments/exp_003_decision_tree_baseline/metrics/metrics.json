@@ -1,0 +1,13 @@
+{
+    "experiment_id": "exp_003_decision_tree_baseline",
+    "method": "Decision Tree Baseline",
+    "accuracy": 0.9471,
+    "roc_auc_ovr_macro": 0.9924,
+    "precision_macro": 0.8843,
+    "recall_macro": 0.9025,
+    "f1_macro": 0.891,
+    "f1_weighted": 0.9475,
+    "training_time_sec": 17.4267,
+    "testing_time_sec": 0.0193,
+    "test_samples": 131037
+}

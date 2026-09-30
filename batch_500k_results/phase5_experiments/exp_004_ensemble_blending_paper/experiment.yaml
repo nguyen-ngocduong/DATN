@@ -1,0 +1,29 @@
+experiment_id: exp_004_ensemble_blending_paper
+experiment_name: Ensemble Blending Model
+description: Proposed Ensemble Blending Model with Soft Voting combining DT + RF +
+  GB (Algorithm 1)
+status: completed
+timestamp_start: '2026-09-28T14:09:04.811723'
+timestamp_end: '2026-09-28T14:14:18.722446'
+total_duration_sec: 313.91
+method: Ensemble Blending Model
+task: 8-Class IoT Attack Classification (IEEE Access CICIoT2023)
+data:
+  features_count: 25
+  train_samples: 524145
+  test_samples: 131037
+  classes:
+  - BruteForce
+  - DDoS
+  - DoS
+  - Mirai
+  - Normal
+  - Recon
+  - Spoofing
+  - Web-Based
+primary_metric:
+  f1_macro: 0.9166
+  accuracy: 0.9626
+  roc_auc: 0.9975
+metrics_reference: metrics/metrics.json
+config_reference: config/hyperparameters.yaml

@@ -1,0 +1,13 @@
+features: 25
+hyperparameters:
+  estimators:
+  - DecisionTree (max_depth=12)
+  - RandomForest (n_est=60)
+  - GradientBoosting (max_iter=60)
+  random_state: 123
+  voting: soft
+  weights:
+  - 1
+  - 2
+  - 2
+trained_samples: 204412

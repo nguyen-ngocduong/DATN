@@ -1,0 +1,20 @@
+[2026-09-28 14:08:44,347] INFO: ===========================================================================
+[2026-09-28 14:08:44,348] INFO: STARTING EXPERIMENT: [exp_003_decision_tree_baseline]
+[2026-09-28 14:08:44,348] INFO: Method: Decision Tree Baseline
+[2026-09-28 14:08:44,348] INFO: Description: Decision Tree baseline classifier (Level 1 base model from paper)
+[2026-09-28 14:08:44,348] INFO: ===========================================================================
+[2026-09-28 14:08:44,349] INFO: Training Decision Tree Baseline on 524,145 samples...
+[2026-09-28 14:09:01,775] INFO: Training completed in 17.43 seconds.
+[2026-09-28 14:09:01,776] INFO: Predicting on 131,037 test samples...
+[2026-09-28 14:09:01,796] INFO: Inference completed in 0.0193 seconds.
+[2026-09-28 14:09:02,935] INFO: Accuracy:    94.71%
+[2026-09-28 14:09:02,936] INFO: ROC-AUC:     0.9924
+[2026-09-28 14:09:02,936] INFO: Precision:   88.43%
+[2026-09-28 14:09:02,936] INFO: Recall:      90.25%
+[2026-09-28 14:09:02,936] INFO: F1 (Macro):  89.10%
+[2026-09-28 14:09:02,937] INFO: F1 (Wtd):    94.75%
+[2026-09-28 14:09:02,970] INFO: Model checkpoint saved to: /content/drive/MyDrive/do_an/phase5_experiments_500k/exp_003_decision_tree_baseline/model/model.pkl
+[2026-09-28 14:09:04,415] INFO: Confusion matrix saved to: /content/drive/MyDrive/do_an/phase5_experiments_500k/exp_003_decision_tree_baseline/metrics/confusion_matrix.png
+[2026-09-28 14:09:04,424] INFO: Experiment metadata saved to: /content/drive/MyDrive/do_an/phase5_experiments_500k/exp_003_decision_tree_baseline/experiment.yaml
+[2026-09-28 14:09:04,799] INFO: Experiment [exp_003_decision_tree_baseline] completed successfully!
+

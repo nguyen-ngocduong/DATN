@@ -1,0 +1,39 @@
+{
+    "evaluation_id": "eval_001_exp_001_rf_baseline",
+    "phase5_experiment_id": "exp_001_rf_baseline",
+    "model_type": "RandomForestClassifier",
+    "validation_summary": {
+        "accuracy": 0.9597,
+        "precision_macro": 0.9156,
+        "recall_macro": 0.9319,
+        "f1_macro": 0.9221,
+        "f1_weighted": 0.9602,
+        "roc_auc_macro": 0.9976,
+        "eval_duration_sec": 0.7163
+    },
+    "test_summary": {
+        "accuracy": 0.9607,
+        "precision_macro": 0.9172,
+        "recall_macro": 0.9333,
+        "f1_macro": 0.9234,
+        "f1_weighted": 0.9612,
+        "roc_auc_macro": 0.9974,
+        "eval_duration_sec": 0.3572
+    },
+    "latency_performance": {
+        "single_sample_latency_ms": {
+            "mean": 24.5557,
+            "median_p50": 24.4103,
+            "p95": 25.6902
+        },
+        "batch_performance": {
+            "throughput_samples_per_sec": 81137.05,
+            "batch_ms_per_sample": 0.0123
+        }
+    },
+    "system_environment": {
+        "python_version": "3.13.5",
+        "scikit_learn_version": "1.9.0",
+        "timestamp": "2026-09-27T17:03:00"
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "experiment_id": "exp_004_ensemble_blending_paper",
+    "method": "Ensemble Blending Model",
+    "accuracy": 0.9517,
+    "roc_auc_ovr_macro": 0.9969,
+    "precision_macro": 0.8924,
+    "recall_macro": 0.9231,
+    "f1_macro": 0.9042,
+    "f1_weighted": 0.9527,
+    "training_time_sec": 127.9334,
+    "testing_time_sec": 4.835,
+    "test_samples": 53413
+}

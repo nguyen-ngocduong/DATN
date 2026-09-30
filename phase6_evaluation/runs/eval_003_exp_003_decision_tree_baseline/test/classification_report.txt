@@ -1,0 +1,14 @@
+              precision    recall  f1-score   support
+
+  BruteForce       0.59      0.84      0.69       706
+        DDoS       1.00      1.00      1.00     10121
+         DoS       1.00      1.00      1.00      3116
+       Mirai       1.00      1.00      1.00      2390
+      Normal       0.63      0.89      0.74       709
+       Recon       0.94      0.80      0.87      3768
+    Spoofing       0.90      0.82      0.86      1478
+   Web-Based       0.87      0.89      0.88      4419
+
+    accuracy                           0.94     26707
+   macro avg       0.87      0.90      0.88     26707
+weighted avg       0.94      0.94      0.94     26707

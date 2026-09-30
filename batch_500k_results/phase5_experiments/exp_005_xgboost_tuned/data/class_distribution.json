@@ -1,0 +1,24 @@
+{
+    "train_samples": 524145,
+    "test_samples": 131037,
+    "train_distribution": {
+        "DDoS": 228093,
+        "DoS": 79034,
+        "Web-Based": 72957,
+        "Recon": 60241,
+        "Mirai": 38038,
+        "Spoofing": 23242,
+        "BruteForce": 12203,
+        "Normal": 10337
+    },
+    "test_distribution": {
+        "DDoS": 57023,
+        "DoS": 19759,
+        "Web-Based": 18239,
+        "Recon": 15060,
+        "Mirai": 9510,
+        "Spoofing": 5811,
+        "BruteForce": 3051,
+        "Normal": 2584
+    }
+}

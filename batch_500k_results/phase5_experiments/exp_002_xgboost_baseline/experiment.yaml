@@ -1,0 +1,28 @@
+experiment_id: exp_002_xgboost_baseline
+experiment_name: Gradient Boosting Baseline
+description: 'Gradient Boosting baseline (Table 2 config: lr=0.1, max_depth=3, n_est=100)'
+status: completed
+timestamp_start: '2026-09-28T14:07:19.435152'
+timestamp_end: '2026-09-28T14:08:43.978197'
+total_duration_sec: 84.54
+method: Gradient Boosting Baseline
+task: 8-Class IoT Attack Classification (IEEE Access CICIoT2023)
+data:
+  features_count: 25
+  train_samples: 524145
+  test_samples: 131037
+  classes:
+  - BruteForce
+  - DDoS
+  - DoS
+  - Mirai
+  - Normal
+  - Recon
+  - Spoofing
+  - Web-Based
+primary_metric:
+  f1_macro: 0.8877
+  accuracy: 0.9502
+  roc_auc: 0.9965
+metrics_reference: metrics/metrics.json
+config_reference: config/hyperparameters.yaml

@@ -1,0 +1,16 @@
+experiment_id: exp_001_rf_baseline
+experiment_name: Random Forest Baseline
+method: Random Forest
+phase: 5
+status: completed
+created_at: '2026-09-27T16:20:00'
+description: Random Forest baseline with 100 estimators matching IEEE paper Section
+  III
+linked_evaluation_run: eval_001_exp_001_rf_baseline
+config_path: exp_001_rf_baseline/config/hyperparameters.yaml
+metrics_reference: metrics/metrics.json
+config_reference: config/hyperparameters.yaml
+primary_metric:
+  f1_macro: 0.8326
+  accuracy: 0.8615
+  roc_auc: 0.9919

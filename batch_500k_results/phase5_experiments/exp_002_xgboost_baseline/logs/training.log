@@ -1,0 +1,20 @@
+[2026-09-28 14:07:19,433] INFO: ===========================================================================
+[2026-09-28 14:07:19,434] INFO: STARTING EXPERIMENT: [exp_002_xgboost_baseline]
+[2026-09-28 14:07:19,434] INFO: Method: Gradient Boosting Baseline
+[2026-09-28 14:07:19,434] INFO: Description: Gradient Boosting baseline (Table 2 config: lr=0.1, max_depth=3, n_est=100)
+[2026-09-28 14:07:19,434] INFO: ===========================================================================
+[2026-09-28 14:07:19,435] INFO: Training Gradient Boosting Baseline on 524,145 samples...
+[2026-09-28 14:08:25,814] INFO: Training completed in 66.38 seconds.
+[2026-09-28 14:08:25,815] INFO: Predicting on 131,037 test samples...
+[2026-09-28 14:08:33,151] INFO: Inference completed in 7.3358 seconds.
+[2026-09-28 14:08:41,481] INFO: Accuracy:    95.02%
+[2026-09-28 14:08:41,482] INFO: ROC-AUC:     0.9965
+[2026-09-28 14:08:41,483] INFO: Precision:   87.13%
+[2026-09-28 14:08:41,483] INFO: Recall:      91.63%
+[2026-09-28 14:08:41,483] INFO: F1 (Macro):  88.77%
+[2026-09-28 14:08:41,484] INFO: F1 (Wtd):    95.12%
+[2026-09-28 14:08:41,965] INFO: Model checkpoint saved to: /content/drive/MyDrive/do_an/phase5_experiments_500k/exp_002_xgboost_baseline/model/model.pkl
+[2026-09-28 14:08:43,977] INFO: Confusion matrix saved to: /content/drive/MyDrive/do_an/phase5_experiments_500k/exp_002_xgboost_baseline/metrics/confusion_matrix.png
+[2026-09-28 14:08:43,985] INFO: Experiment metadata saved to: /content/drive/MyDrive/do_an/phase5_experiments_500k/exp_002_xgboost_baseline/experiment.yaml
+[2026-09-28 14:08:44,339] INFO: Experiment [exp_002_xgboost_baseline] completed successfully!
+

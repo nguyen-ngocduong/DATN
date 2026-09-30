@@ -1,0 +1,16 @@
+experiment_id: exp_004_ensemble_blending_paper
+experiment_name: Ensemble Blending Model
+method: Ensemble Blending
+phase: 5
+status: completed
+created_at: '2026-09-27T16:20:00'
+description: Proposed Ensemble Blending Model with Soft Voting combining DT + RF +
+  GB (Algorithm 1)
+linked_evaluation_run: eval_004_exp_004_ensemble_blending_paper
+config_path: exp_004_ensemble_blending_paper/config/hyperparameters.yaml
+metrics_reference: metrics/metrics.json
+config_reference: config/hyperparameters.yaml
+primary_metric:
+  f1_macro: 0.7934
+  accuracy: 0.8409
+  roc_auc: 0.9879

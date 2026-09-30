@@ -1,0 +1,50 @@
+phase: 'Phase 5: Candidate Model Experimentation & Hyperparameter Tuning'
+dataset: CICIoT2023 8-Class IoT Attack Dataset
+last_updated: '2026-09-28T14:17:10.138327'
+best_experiment_id: exp_005_xgboost_tuned
+experiments:
+- exp_id: exp_005_xgboost_tuned
+  method: XGBoost / Gradient Boosting Tuned
+  status: best
+  linked_eval: eval_001_exp_005_xgboost_tuned
+  notes: Best model - exceeds paper baseline
+  metrics:
+    accuracy: 0.9751
+    f1_macro: 0.9457
+    roc_auc: 0.9988
+- exp_id: exp_001_rf_baseline
+  method: Random Forest Baseline
+  status: completed
+  linked_eval: eval_002_exp_001_rf_baseline
+  notes: 'Candidate model: Random Forest Baseline'
+  metrics:
+    accuracy: 0.9679
+    f1_macro: 0.9309
+    roc_auc: 0.9978
+- exp_id: exp_004_ensemble_blending_paper
+  method: Ensemble Blending Model
+  status: completed
+  linked_eval: eval_003_exp_004_ensemble_blending_paper
+  notes: 'Candidate model: Ensemble Blending Model'
+  metrics:
+    accuracy: 0.9626
+    f1_macro: 0.9166
+    roc_auc: 0.9975
+- exp_id: exp_003_decision_tree_baseline
+  method: Decision Tree Baseline
+  status: completed
+  linked_eval: eval_004_exp_003_decision_tree_baseline
+  notes: 'Candidate model: Decision Tree Baseline'
+  metrics:
+    accuracy: 0.9471
+    f1_macro: 0.891
+    roc_auc: 0.9924
+- exp_id: exp_002_xgboost_baseline
+  method: Gradient Boosting Baseline
+  status: completed
+  linked_eval: eval_005_exp_002_xgboost_baseline
+  notes: 'Candidate model: Gradient Boosting Baseline'
+  metrics:
+    accuracy: 0.9502
+    f1_macro: 0.8877
+    roc_auc: 0.9965

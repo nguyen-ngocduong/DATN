@@ -1,0 +1,29 @@
+experiment_id: exp_004_ensemble_blending_paper
+experiment_name: Ensemble Blending (RF + GB)
+description: "M\xF4 h\xECnh k\u1EBFt h\u1EE3p Random Forest v\xE0 Gradient Boosting\
+  \ theo \u0111\u1EC1 xu\u1EA5t b\xE0i b\xE1o"
+status: completed
+timestamp_start: '2026-09-27T14:38:15.021495'
+timestamp_end: '2026-09-27T14:40:15.014594'
+total_duration_sec: 119.99
+method: Ensemble Blending (RF + GB)
+task: 8-Class IoT Attack Classification (IEEE Access CICIoT2023)
+data:
+  features_count: 25
+  train_samples: 213649
+  test_samples: 53413
+  classes:
+  - BruteForce
+  - DDoS
+  - DoS
+  - Mirai
+  - Normal
+  - Recon
+  - Spoofing
+  - Web-Based
+primary_metric:
+  f1_macro: 0.9071
+  accuracy: 0.9533
+  roc_auc: 0.9969
+metrics_reference: metrics/metrics.json
+config_reference: config/hyperparameters.yaml

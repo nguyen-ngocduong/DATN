@@ -1,0 +1,20 @@
+[2026-09-28 14:14:19,100] INFO: ===========================================================================
+[2026-09-28 14:14:19,101] INFO: STARTING EXPERIMENT: [exp_005_xgboost_tuned]
+[2026-09-28 14:14:19,101] INFO: Method: XGBoost / Gradient Boosting Tuned
+[2026-09-28 14:14:19,101] INFO: Description: Hyperparameter-tuned boosting model with deeper depth=6 and 150 iterations
+[2026-09-28 14:14:19,101] INFO: ===========================================================================
+[2026-09-28 14:14:19,102] INFO: Training XGBoost / Gradient Boosting Tuned on 524,145 samples...
+[2026-09-28 14:16:33,112] INFO: Training completed in 134.01 seconds.
+[2026-09-28 14:16:33,112] INFO: Predicting on 131,037 test samples...
+[2026-09-28 14:16:49,736] INFO: Inference completed in 16.6229 seconds.
+[2026-09-28 14:17:07,712] INFO: Accuracy:    97.51%
+[2026-09-28 14:17:07,713] INFO: ROC-AUC:     0.9988
+[2026-09-28 14:17:07,713] INFO: Precision:   93.74%
+[2026-09-28 14:17:07,714] INFO: Recall:      95.64%
+[2026-09-28 14:17:07,714] INFO: F1 (Macro):  94.57%
+[2026-09-28 14:17:07,714] INFO: F1 (Wtd):    97.51%
+[2026-09-28 14:17:08,365] INFO: Model checkpoint saved to: /content/drive/MyDrive/do_an/phase5_experiments_500k/exp_005_xgboost_tuned/model/model.pkl
+[2026-09-28 14:17:09,787] INFO: Confusion matrix saved to: /content/drive/MyDrive/do_an/phase5_experiments_500k/exp_005_xgboost_tuned/metrics/confusion_matrix.png
+[2026-09-28 14:17:09,795] INFO: Experiment metadata saved to: /content/drive/MyDrive/do_an/phase5_experiments_500k/exp_005_xgboost_tuned/experiment.yaml
+[2026-09-28 14:17:10,147] INFO: Experiment [exp_005_xgboost_tuned] completed successfully!
+

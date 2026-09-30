@@ -1,0 +1,26 @@
+{
+    "eval_id": "eval_005_exp_005_xgboost_tuned",
+    "phase5_experiment_id": "exp_005_xgboost_tuned",
+    "model_type": "HistGradientBoostingClassifier",
+    "reproducibility": {
+        "phase5_training_seed": 123,
+        "holdout_split_seed": 123,
+        "val_test_split_seed": 123
+    },
+    "n_features": 25,
+    "val_metrics": {
+        "accuracy": 0.9705,
+        "f1_macro": 0.9403,
+        "roc_auc_macro": 0.9987
+    },
+    "test_metrics": {
+        "accuracy": 0.969,
+        "f1_macro": 0.9357,
+        "roc_auc_macro": 0.9985
+    },
+    "latency_metrics": {
+        "median_ms": 15.112033500145117,
+        "throughput_sps": 66.17243139319386
+    },
+    "threshold_optimization_ref": "threshold_optimization.json"
+}

@@ -1,0 +1,12 @@
+experiment_id: exp_005_xgboost_tuned
+model_name: XGBoost / Gradient Boosting Tuned
+model_class: HistGradientBoostingClassifier
+hyperparameters:
+  learning_rate: 0.08
+  max_iter: 150
+  max_depth: 6
+  l2_regularization: 0.1
+  class_weight: balanced
+  random_state: 123
+training_time_seconds: 63.76
+timestamp: '2026-09-27T16:38:57.633753'

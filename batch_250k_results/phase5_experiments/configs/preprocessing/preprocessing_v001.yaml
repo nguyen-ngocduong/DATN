@@ -1,0 +1,34 @@
+version: v001
+pipeline_name: CICIoT2023 Robust Outlier-Resistant Preprocessing
+scaling:
+  method: RobustScaler
+  rationale: Resilient to extreme IoT traffic outliers (bursts up to 10^9) by centering
+    on median and scaling by IQR (25th-75th percentile).
+traffic_transforms:
+  method: log1p
+  formula: log(1 + x)
+  features_applied:
+  - Rate
+  - Srate
+  - Drate
+  - Tot sum
+  - flow_duration
+  - IAT
+  - total_counts
+  - syn_ack_ratio
+  - rst_syn_ratio
+  purpose: Compress heavy-tailed distributions and stabilize Euclidean distances for
+    k-NN / tree splitting.
+imputation:
+  strategy: median_replacement
+  rationale: Preserves distribution medians without being skewed by extreme traffic
+    spikes.
+deduplication:
+  strategy: Bidirectional Row Hashing
+  hash_algorithm: SHA-256
+  purpose: Removes internal duplicates and guarantees absolute zero cross-set leakage
+    between train and test.
+label_hierarchy:
+  tier_1: 34 detailed attack types + BenignTraffic
+  tier_2: 8 standardized attack groups + Normal (IEEE Access 2023 taxonomy)
+  tier_3: 'Binary classification (0: Normal, 1: Attack)'
